@@ -79,8 +79,6 @@ void quick_sort(Iter first, Iter end, Comp comp)
     std::advance(tempIt, size / 2);
     auto key = *tempIt;
     
-    //auto key = *first;
-
     auto firstIt = temp.begin();
     auto endIt = temp.end();
     auto insertEl = [&](const GET_VAL_T_FROM_ITER_T(Iter)& el)
