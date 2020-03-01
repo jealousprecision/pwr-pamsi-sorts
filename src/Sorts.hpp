@@ -15,27 +15,30 @@ template<typename Iter, typename Comp, typename size_t>
 void merge(Iter first, Iter halfRangeEnd, Iter end, size_t size, Comp comp)
 {
     std::vector<GET_VAL_T_FROM_ITER_T(Iter)> temp; 
-    temp.reserve(size);  // optimization
+    temp.resize(size);  // optimization
 
     auto halfRangeIt = halfRangeEnd;
     auto it = first;
+    auto inserterIt = temp.begin();
     while (true)
     {
         if (it == halfRangeEnd)
         {
-            std::copy(halfRangeIt, end, std::back_inserter(temp));
+            std::copy(halfRangeIt, end, inserterIt);
             break;
         }
         if (halfRangeIt == end)
         {
-            std::copy(it, halfRangeEnd, std::back_inserter(temp));
+            std::copy(it, halfRangeEnd, inserterIt);
             break;
         }
 
         if (comp(*it, *halfRangeIt))
-            temp.push_back(*halfRangeIt++);
+            //temp.push_back(*halfRangeIt++);a
+            *inserterIt++ = *halfRangeIt++;
         else
-            temp.push_back(*it++);
+            //temp.push_back(*it++);
+            *inserterIt++ = *it++;
     }
     
     std::copy(temp.begin(), temp.end(), first);
@@ -72,36 +75,27 @@ void quick_sort(Iter first, Iter end, Comp comp)
     
     auto key = *first;
 
-    GET_VAL_T_FROM_ITER_T(Iter) temp[size];
+    //GET_VAL_T_FROM_ITER_T(Iter) temp[size];
+    std::vector<GET_VAL_T_FROM_ITER_T(Iter)> temp;
+    temp.resize(size);
 
-    auto firstIt = temp;
-    auto endIt = temp + size;
-    std::for_each(first + 1, end, 
+    auto firstIt = temp.begin();
+    auto endIt = temp.end();
+    std::for_each(first + 1, end,
         [&](const auto& el)
         {
             if (comp(key, el))
-            {
-                *firstIt = el;
-                firstIt++;
-            }
+                *firstIt++ = el;
             else
-            {
-                endIt--;
-                *endIt = el;
-            }
+                *--endIt = el;
         });
     
     *firstIt = key;
 
-    std::cout << "temp: ";
-    for (int i=0; i<size; ++i)
-        std::cout << temp[i] << ", ";
-    std::cout << std::endl;
+    quick_sort(temp.begin(), firstIt, comp);
+    quick_sort(endIt, temp.end(), comp);
 
-    quick_sort(temp, firstIt, comp);
-    quick_sort(endIt, temp + size, comp);
-
-    std::copy(temp, temp + size, first);
+    std::copy(temp.begin(), temp.end(), first);
 }
 
 template<typename Iter>
