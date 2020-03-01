@@ -13,7 +13,11 @@
 
 using namespace std;
 
-void fillWithRandom(vector<int>& vec, long count, unsigned max, int offset)
+void fillWithRandom(
+    vector<int>& vec,
+     long count = pow(10,6), 
+     unsigned max = numeric_limits<unsigned>::max(), 
+     int offset = 0)
 {
     vec.clear();
     vec.resize(count);
@@ -68,13 +72,60 @@ void test_merge_sort()
     timer.printNow();
 }
 
+void test_heap_sort()
+{
+    vector<int> vec;
+    fillWithRandom(vec, pow(10, 4));
+    auto vec_test = vec;
+
+    Timer timer(std::cout, "TimerHeapSort");
+    heap_sort(vec.begin(), vec.end());
+    timer.printNow();
+
+    std::sort(vec_test.begin(), vec_test.end());
+    std::cout << "Is good? " << std::equal(vec_test.begin(), vec_test.end(), vec.begin()) << std::endl;
+}
+
 int main()
 {
-    srand(time(nullptr));
-    vector<int> vec;
+    vector test{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-    fillWithRandom(vec, 20, 50, 0);
+    for (auto el : test)
+    {
+        std::cout << "Index value: " << el << " -> " << getRowInHeap(el) << endl;
+    }
 
-    test_merge_sort();
-    test_quick_sort();
+    for (auto el : test)
+    {
+        std::cout << "Index value: " << el << " links to children: " << getChildrenIdx(el) << endl;
+    }
+
+    vector heapIdxTest{4, 10, 5, 1, 8, 42, 420, 69, 2137, 666, 7};
+
+    for (int i = 0; i < heapIdxTest.size(); ++i)
+    {
+        std::cout << "Index value, value: (" << i << ", " << heapIdxTest[i] << ") is parent to: " 
+            << getChildren(heapIdxTest.begin(), heapIdxTest.end(), i) << std::endl;
+    }
+
+    cout << "\n\n\n";
+
+    makeHeapMax(heapIdxTest.begin(), heapIdxTest.end());
+    for (int i = 0; i < heapIdxTest.size(); ++i)
+    {
+        std::cout << "Index value, value: (" << i << ", " << heapIdxTest[i] << ") is parent to: " 
+            << getChildren(heapIdxTest.begin(), heapIdxTest.end(), i) << std::endl;
+    }
+
+    for (int i=0; i < heapIdxTest.size(); ++i)
+    {
+        auto children = getChildren(heapIdxTest.begin(), heapIdxTest.end(), i);
+
+        if (children.first)
+            std::cout << heapIdxTest[i] << " -> " << children.first.get() << ";" << endl;
+        if (children.second)
+            std::cout << heapIdxTest[i] << " -> " << children.second.get() << ";" << endl;
+    }
+
+    test_heap_sort();
 }
