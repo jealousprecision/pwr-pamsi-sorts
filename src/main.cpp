@@ -22,22 +22,29 @@ void fillWithRandom(vector<int>& vec, long count, unsigned max, int offset)
         vec[i] = rand() % max + offset;
 }
 
+void fillWithSomewhatSorted(vector<int>& vec, long count, unsigned max, double percentageSorted)
+{
+    if (percentageSorted > 1.0)
+        throw std::runtime_error("fillWithSomewhatSorted(): Wrong percentage");
+
+    fillWithRandom(vec, count, max, 0);
+
+    auto end = vec.end() - (unsigned) (vec.size() * (1 - percentageSorted));
+
+    if (end < vec.begin())
+        throw std::runtime_error("");
+
+    std::sort(vec.begin(), end);
+}
+
 void test_quick_sort()
 {
     vector<int> vec;
     fillWithRandom(vec, pow(10, 6), numeric_limits<int>::max(), 0);
-    auto vec_test = vec;
-
 
     Timer timer(std::cout, "TimerQuickSort");
     quick_sort(vec.begin(), vec.end());
     timer.printNow();
-
-    timer.reset();
-    std::sort(vec_test.begin(), vec_test.end());
-    timer.printNow();
-    
-    cout << "Is good? " << std::equal(vec_test.begin(), vec_test.end(), vec.begin()) << endl;
 }
 
 void test_merge_sort()
@@ -50,11 +57,15 @@ void test_merge_sort()
     merge_sort(vec.begin(), vec.end());
     timer.printNow();
 
+    fillWithSomewhatSorted(vec, pow(10, 6), numeric_limits<int>::max(), 0.997);
     timer.reset();
-    std::sort(vec_test.begin(), vec_test.end());
+    quick_sort(vec.begin(), vec.end());
     timer.printNow();
 
-    cout << "Is good? " << std::equal(vec_test.begin(), vec_test.end(), vec.begin()) << endl;
+    fillWithSomewhatSorted(vec, pow(10, 6), numeric_limits<int>::max(), 0.997);
+    timer.reset();
+    merge_sort(vec.begin(), vec.end());
+    timer.printNow();
 }
 
 int main()
@@ -64,6 +75,6 @@ int main()
 
     fillWithRandom(vec, 20, 50, 0);
 
-    test_quick_sort();
     test_merge_sort();
+    test_quick_sort();
 }
