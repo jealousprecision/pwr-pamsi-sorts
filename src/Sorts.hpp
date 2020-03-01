@@ -63,3 +63,49 @@ void merge_sort(Iter it, Iter end)
     merge_sort(it, end, std::greater<GET_VAL_T_FROM_ITER_T(Iter)>());
 }
 
+template<typename Iter, typename Comp>
+void quick_sort(Iter first, Iter end, Comp comp)
+{
+    auto size = std::distance(first, end);
+    if (size <= 1)
+        return;
+    
+    auto key = *first;
+
+    GET_VAL_T_FROM_ITER_T(Iter) temp[size];
+
+    auto firstIt = temp;
+    auto endIt = temp + size;
+    std::for_each(first + 1, end, 
+        [&](const auto& el)
+        {
+            if (comp(key, el))
+            {
+                *firstIt = el;
+                firstIt++;
+            }
+            else
+            {
+                endIt--;
+                *endIt = el;
+            }
+        });
+    
+    *firstIt = key;
+
+    std::cout << "temp: ";
+    for (int i=0; i<size; ++i)
+        std::cout << temp[i] << ", ";
+    std::cout << std::endl;
+
+    quick_sort(temp, firstIt, comp);
+    quick_sort(endIt, temp + size, comp);
+
+    std::copy(temp, temp + size, first);
+}
+
+template<typename Iter>
+void quick_sort(Iter first, Iter end)
+{
+    quick_sort(first, end, std::greater<GET_VAL_T_FROM_ITER_T(Iter)>());
+}

@@ -1,7 +1,10 @@
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 
+#include <algorithm>
 #include <iostream>
+#include <limits>
 #include <vector>
 
 #include <Sorts.hpp>
@@ -10,21 +13,25 @@
 
 using namespace std;
 
-void fillWithRandom(vector<int>& vec, unsigned count, unsigned max, int offset)
+void fillWithRandom(vector<int>& vec, long count, unsigned max, int offset)
 {
-    for (int i = 0; i < count; ++i)
-        vec.push_back(rand() % (max+1) + offset);
+    vec.clear();
+    vec.reserve(count);
+    
+    for (long i=0; i<count; ++i)
+        vec.push_back(rand() % max);
 }
 
 int main()
 {
     srand(time(nullptr));
     vector<int> vec;
-    fillWithRandom(vec, 50, 20, 0);
 
-    merge_sort(vec.begin(), vec.end());
+    fillWithRandom(vec, 20, 50, 0);
 
-    cout << "vector vec: ";
+    quick_sort(vec.begin(), vec.end());
+
+    cout << "Vec: ";
     PrintTools::printContainer(cout, vec);
     cout << endl;
 }
