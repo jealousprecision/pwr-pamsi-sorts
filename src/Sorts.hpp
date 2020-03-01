@@ -198,21 +198,21 @@ void makeHeapMax(Iter first, Iter end, long idx, Comp comp)
     auto& el =  *(first + idx);
     auto children = getChildren(first, end, idx);
 
-    if (children.first.ptr != nullptr)
+    if (children.first)
     {
         makeHeapMax(first, end, children.first.idx, comp);
         if (comp(children.first, el))
         {
-            std::swap(*children.first.ptr, el);
+            std::swap(children.first.get(), el);
             makeHeapMax(first, end, children.first.idx, comp);
         }
     }
-    if (children.second.ptr != nullptr)
+    if (children.second)
     {
         makeHeapMax(first, end, children.second.idx, comp);
         if (comp(children.second, el))
         {
-            std::swap(*children.second.ptr, el);
+            std::swap(children.second.get(), el);
             makeHeapMax(first, end, children.second.idx, comp);
         }
     }   

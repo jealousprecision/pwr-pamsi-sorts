@@ -75,7 +75,7 @@ void test_merge_sort()
 void test_heap_sort()
 {
     vector<int> vec;
-    fillWithRandom(vec, pow(10, 4));
+    fillWithRandom(vec, pow(10, 3));
     auto vec_test = vec;
 
     Timer timer(std::cout, "TimerHeapSort");
