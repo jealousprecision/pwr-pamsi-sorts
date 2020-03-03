@@ -9,6 +9,9 @@
 #include <vector>
 #include <type_traits>
 #include <utility>
+#include <deque>
+
+#include <SortsHelpers.hpp>
 
 // get value type from templated Iterator typename without initializing any variables
 #define GET_VAL_T_FROM_ITER_T(Iter_t) typename std::remove_reference<decltype(*std::declval<Iter_t>())>::type
@@ -134,7 +137,7 @@ std::ostream& operator<<(std::ostream& os, const std::pair<long, long>& obj)
 }
 
 template<typename T>
-struct PtrIndexPair
+struct Child
 {
     operator T&() {return *ptr;}
     operator const T&() const {return *ptr;}
@@ -143,13 +146,40 @@ struct PtrIndexPair
     const T& get() const {return *ptr;}
 
     operator bool() {return ptr != nullptr;}
+    bool operator>(const Child& other) 
+    { 
+        if (*this)
+        {
+            if (other)
+                return *ptr > *other.ptr;
+            else
+                return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    bool operator<(const Child& other)
+    {
+        if (other)
+        {
+            if (*this)
+                return *ptr < *other.ptr;
+            else
+                return false;
+        }
+        else
+            return false;
+    }
 
     T* ptr;
     long idx;
 };
 
 template<typename T>
-using Children = std::pair<PtrIndexPair<T>, PtrIndexPair<T>>;
+using Children = std::pair<Child<T>, Child<T>>;
 
 template<typename Iter>
 Children<GET_VAL_T_FROM_ITER_T(Iter)> getChildren(Iter first, Iter end, long idx)
@@ -161,7 +191,7 @@ Children<GET_VAL_T_FROM_ITER_T(Iter)> getChildren(Iter first, Iter end, long idx
     
     if (possibleChildren.first < end)
     {
-        ret.first.ptr = &*possibleChildren.first;
+        ret.first.ptr = &*possibleChildren.first;*possibleChildren.first;
         ret.first.idx = chIdx.first;
     }
     else
@@ -181,9 +211,9 @@ Children<GET_VAL_T_FROM_ITER_T(Iter)> getChildren(Iter first, Iter end, long idx
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const Children<T>& children)
 {
-    if (children.first.ptr != nullptr)
+    if (children.first)
         os << children.first;
-    if (children.second.ptr != nullptr)
+    if (children.second)
         os << ", " << children.second;
     
     return os;
@@ -201,21 +231,18 @@ void makeHeapMax(Iter first, Iter end, long idx, Comp comp)
     if (children.first)
     {
         makeHeapMax(first, end, children.first.idx, comp);
-        if (comp(children.first, el))
+        if(children.second)
         {
-            std::swap(children.first.get(), el);
-            makeHeapMax(first, end, children.first.idx, comp);
-        }
-    }
-    if (children.second)
-    {
-        makeHeapMax(first, end, children.second.idx, comp);
-        if (comp(children.second, el))
-        {
-            std::swap(children.second.get(), el);
             makeHeapMax(first, end, children.second.idx, comp);
+            auto max = getMaxEl(el, children.first.get(), children.second.get());
+            std::swap(el, max.get());
         }
-    }   
+        else
+        {   
+            auto max = getMaxEl(el, children.first.get());
+            std::swap(el, max.get());
+        }
+    } 
 }
 
 template<typename Iter>
@@ -223,6 +250,20 @@ void makeHeapMax(Iter first, Iter end)
 {
     makeHeapMax(first, end, 0, std::greater<GET_VAL_T_FROM_ITER_T(Iter)>());
 }
+
+/**
+ * !!! Function assumes that elemetn we want to push down
+ * is in the root of container
+ */
+template<typename Iter, typename Comp>
+void pushDownHeap(Iter first, Iter end, long idx, Comp comp)
+{
+    auto& el = *first;
+    auto possibleChildren = getChildren(first, end, idx);
+
+    auto maxChild = getMaxEl(possibleChildren.first, possibleChildren.second);
+}
+
 
 template<typename Iter, typename Comp>
 void heap_sort(Iter first, Iter end, Comp comp)
