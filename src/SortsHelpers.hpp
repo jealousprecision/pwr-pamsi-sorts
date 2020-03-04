@@ -2,27 +2,23 @@
 
 #include <functional>
 
-template<typename T>
-using RefTo = std::reference_wrapper<T>;
-
-template<typename T>
-RefTo<T> getMaxEl(RefTo<T> max)
+template<typename T, typename Comp>
+T& getMaxEl(Comp comp, T& t1, T& t2)
 {
-    return max;
+    return comp(t1, t2) ? t1 : t2;
+}
+
+template<typename T, typename Comp, typename... Args>
+T& getMaxEl(Comp comp, T& t1, T& t2, Args... args)
+{
+    if (comp(t1, t2))
+        return getMaxEl(comp, t1, args...);
+    else
+        return getMaxEl(comp, t2, args...);
 }
 
 template<typename T, typename... Args>
-RefTo<T> getMaxEl(RefTo<T> max, T& newArg, Args&... args)
+T& getMaxEl(T& t1, T& t2, Args... args)
 {
-    if (max.get() < newArg)
-        max = newArg;
-
-    return getMaxEl(max, args...);
-}
-
-template<typename T, typename... Args>
-RefTo<T> getMaxEl(T& val, Args&... args)
-{
-    RefTo<T> ref = val;
-    return getMaxEl(ref, args...);
+    return getMaxEl(std::greater<T>(), t1, t2, args...);
 }

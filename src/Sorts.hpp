@@ -11,15 +11,13 @@
 #include <utility>
 #include <deque>
 
+#include <SortsMacros.hpp>
 #include <SortsHelpers.hpp>
-
-// get value type from templated Iterator typename without initializing any variables
-#define GET_VAL_T_FROM_ITER_T(Iter_t) typename std::remove_reference<decltype(*std::declval<Iter_t>())>::type
 
 template<typename Iter, typename Comp>
 void merge(Iter first, Iter halfRangeEnd, Iter end, Comp comp)
 {
-    std::vector<GET_VAL_T_FROM_ITER_T(Iter)> temp; 
+    std::vector<GET_VAL_T_FROM_ITER_T(Iter)> temp;
     temp.resize(std::distance(first, end));
 
     auto halfRangeIt = halfRangeEnd;
@@ -43,7 +41,7 @@ void merge(Iter first, Iter halfRangeEnd, Iter end, Comp comp)
         else
             *inserterIt++ = *it++;
     }
-    
+
     std::copy(temp.begin(), temp.end(), first);
 }
 
@@ -53,7 +51,7 @@ void merge_sort(Iter first, Iter end, Comp comp)
     auto size = std::distance(first, end);
     if (size <= 1)
         return;
-    
+
     auto halfRangeEnd = first;
     std::advance(halfRangeEnd, size / 2);
 
@@ -79,11 +77,11 @@ void quick_sort(Iter first, Iter end, Comp comp)
     std::vector<GET_VAL_T_FROM_ITER_T(Iter)> temp;
     temp.resize(size);
 
-    
+
     auto tempIt = first;
     std::advance(tempIt, size / 2);
     auto key = *tempIt;
-    
+
     auto firstIt = temp.begin();
     auto endIt = temp.end();
     auto insertEl = [&](const GET_VAL_T_FROM_ITER_T(Iter)& el)
@@ -93,10 +91,10 @@ void quick_sort(Iter first, Iter end, Comp comp)
             else
                 *--endIt = el;
         };
-    
+
     std::for_each(first, tempIt, insertEl);
     std::for_each(++tempIt, end, insertEl);
-    
+
     *firstIt = key;
 
     quick_sort(temp.begin(), firstIt, comp);
@@ -116,6 +114,25 @@ long getRowInHeap(long idx)
     return log2(idx + 1);
 }
 
+class ChildrenIdx
+{
+public:
+    ChildrenIdx(long idx) :
+        idx_(idx)
+    {}
+
+    enum class Chi
+
+    template<long idx>
+    bool childExists(long size);
+
+    template<long idx, typename Iter>
+    ValFromIter<Iter>& getChild(Iter iter);
+
+private:
+    long idx_;
+};
+
 std::pair<long, long> getChildrenIdx(long idx)
 {
     auto parentRow = getRowInHeap(idx);
@@ -131,94 +148,7 @@ std::pair<long, long> getChildrenIdx(long idx)
     return {childrenIdxFirst, childrenIdxFirst + 1};
 }
 
-std::ostream& operator<<(std::ostream& os, const std::pair<long, long>& obj)
-{
-    return os << obj.first << ", " << obj.second;
-}
-
-template<typename T>
-struct Child
-{
-    operator T&() {return *ptr;}
-    operator const T&() const {return *ptr;}
-
-    T& get() {return *ptr;}
-    const T& get() const {return *ptr;}
-
-    operator bool() {return ptr != nullptr;}
-    bool operator>(const Child& other) 
-    { 
-        if (*this)
-        {
-            if (other)
-                return *ptr > *other.ptr;
-            else
-                return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    bool operator<(const Child& other)
-    {
-        if (other)
-        {
-            if (*this)
-                return *ptr < *other.ptr;
-            else
-                return false;
-        }
-        else
-            return false;
-    }
-
-    T* ptr;
-    long idx;
-};
-
-template<typename T>
-using Children = std::pair<Child<T>, Child<T>>;
-
-template<typename Iter>
-Children<GET_VAL_T_FROM_ITER_T(Iter)> getChildren(Iter first, Iter end, long idx)
-{    
-    Children<GET_VAL_T_FROM_ITER_T(Iter)> ret;
-
-    auto chIdx = getChildrenIdx(idx);
-    auto possibleChildren = std::make_pair(first + chIdx.first, first + chIdx.second);
-    
-    if (possibleChildren.first < end)
-    {
-        ret.first.ptr = &*possibleChildren.first;*possibleChildren.first;
-        ret.first.idx = chIdx.first;
-    }
-    else
-        ret.first.ptr = nullptr;
-    
-    if (possibleChildren.second < end)
-    {
-        ret.second.ptr = &*possibleChildren.second;
-        ret.second.idx = chIdx.second;
-    }
-    else
-        ret.second.ptr = nullptr;
-    
-    return ret;
-}
-
-template<typename T>
-std::ostream& operator<<(std::ostream& os, const Children<T>& children)
-{
-    if (children.first)
-        os << children.first;
-    if (children.second)
-        os << ", " << children.second;
-    
-    return os;
-}
-
+/*
 template<typename Iter, typename Comp>
 void makeHeapMax(Iter first, Iter end, long idx, Comp comp)
 {
@@ -238,11 +168,11 @@ void makeHeapMax(Iter first, Iter end, long idx, Comp comp)
             std::swap(el, max.get());
         }
         else
-        {   
+        {
             auto max = getMaxEl(el, children.first.get());
             std::swap(el, max.get());
         }
-    } 
+    }
 }
 
 template<typename Iter>
@@ -254,7 +184,7 @@ void makeHeapMax(Iter first, Iter end)
 /**
  * !!! Function assumes that elemetn we want to push down
  * is in the root of container
- */
+ *
 template<typename Iter, typename Comp>
 void pushDownHeap(Iter first, Iter end, long idx, Comp comp)
 {
@@ -282,5 +212,4 @@ void heap_sort(Iter first, Iter end)
     heap_sort(first, end, std::greater<GET_VAL_T_FROM_ITER_T(Iter)>());
 }
 
-
-#undef GET_VAL_T_FROM_ITER_T
+*/
