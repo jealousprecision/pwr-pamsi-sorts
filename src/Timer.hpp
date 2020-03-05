@@ -21,11 +21,17 @@ public:
 
     inline auto checkNow() const { return std::chrono::steady_clock::now() - start; }
 
-    void printNow() const
+    void printNow(const char* msg) const
     {
         auto duration = checkNow();
-        os << "[" << name << "] printNow(): " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()
+        os << "[" << name << "] printNow(): " << msg << ": " 
+            << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()
             << " ms passed" << std::endl;
+    }
+
+    void printNow() const
+    {
+        printNow("");
     }
 
 protected:

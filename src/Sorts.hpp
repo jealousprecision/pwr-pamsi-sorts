@@ -9,7 +9,6 @@
 #include <vector>
 #include <type_traits>
 #include <utility>
-#include <deque>
 
 #include <SortsMacros.hpp>
 #include <SortsHelpers.hpp>
@@ -114,26 +113,7 @@ long getRowInHeap(long idx)
     return log2(idx + 1);
 }
 
-class ChildrenIdx
-{
-public:
-    ChildrenIdx(long idx) :
-        idx_(idx)
-    {}
-
-    enum class Chi
-
-    template<long idx>
-    bool childExists(long size);
-
-    template<long idx, typename Iter>
-    ValFromIter<Iter>& getChild(Iter iter);
-
-private:
-    long idx_;
-};
-
-std::pair<long, long> getChildrenIdx(long idx)
+long getChildrenIdx(long idx)
 {
     auto parentRow = getRowInHeap(idx);
     auto parentRowOffset = exp2(parentRow) - 1;
@@ -145,8 +125,280 @@ std::pair<long, long> getChildrenIdx(long idx)
     auto childrenOffset = parentOffset * 2;
 
     auto childrenIdxFirst = childrenRowOffset + childrenOffset;
-    return {childrenIdxFirst, childrenIdxFirst + 1};
+    return childrenIdxFirst;
 }
+
+template<typename T>
+class Node
+{
+public:
+    using type = T;
+
+    Node() = default;
+    Node(long idx) :
+        idx_(idx)
+    {}
+    Node(long idx, T& obj) :
+        idx_(idx), obj_(&obj)
+    {}        
+    
+    T& get() { return *obj_; }
+    const T& get() const { return *obj_; }
+
+    operator bool() const { return obj_ != nullptr; }
+    //operator T&() { return *obj_; }
+    //operator const T&() const { return *obj_; }
+
+    long index() const { return idx_; }
+
+private:
+    long idx_ = 0;
+    T* obj_ = nullptr;
+};
+
+template<typename T>
+using Children = std::pair<Node<T>, Node<T>>;
+
+class ChildFactory
+{
+public:
+    template<typename Iter>
+    static Children<ValFromIter<Iter>> makeChildren(Iter iter, long size, long parentIdx)
+    {
+        auto firstIdx = getChildrenIdx(parentIdx);
+        
+        if (firstIdx + 1 < size)
+        {
+            std::advance(iter, firstIdx);
+            return 
+            {
+                Node<ValFromIter<Iter>>(firstIdx, *iter),
+                Node<ValFromIter<Iter>>(firstIdx + 1, *++iter)
+            };
+        }
+        else if (firstIdx < size)
+        {
+            std::advance(iter, firstIdx);
+            return
+            {
+                Node<ValFromIter<Iter>>(firstIdx, *iter),
+                {}
+            };
+        }
+        else
+        {
+            return { {}, {} };
+        }
+    }
+
+    template<typename Iter>
+    static Children<ValFromIter<Iter>> makeChildren(Iter first, Iter end, long parentIdx)
+    {
+        makeChildren(first, std::distance(first, end), parentIdx);
+    }
+};
+
+/*
+template<typename Iter, typename Comp>
+void pushDownMaxHeap(
+    Iter first,
+    long size,
+    long idx,
+    Comp comp)
+{
+    auto childBiggerVal = 
+        [&](const auto& c1, const auto& c2)
+        {
+            return comp(c1.get(), c2.get());
+        };
+
+    if (idx >= size)
+        return;
+
+    auto children = ChildFactory::makeChildren(first, size, idx);
+    if (children.first)
+    {
+        if (children.second)
+        {
+            Node<ValFromIter<Iter>> parent(idx, *());
+            auto max = getMaxEl(
+                childBiggerVal,
+                parent,
+                children.first,
+                children.second);
+
+            if (idx != max.index())
+            {
+                std::swap(el, max.get());
+                pushDownMaxHeap(first, size, max.index(), comp);
+            }
+        }
+        else
+        {
+            // doesn't have second child
+            // i.e end of tree
+            if (comp(children.first.get(), el))
+                std::swap(el, children.first.get());
+        }
+    }
+}
+*/
+template<typename Iter, typename Comp>
+void pushDownMaxHeap(Iter first, long size, long idx, Comp comp)
+{
+    auto childBiggerVal = 
+        [&](const auto& c1, const auto& c2)
+        {
+            return comp(c1.get(), c2.get());
+        };   
+
+    if (idx >= size)
+        return;
+
+    auto children = ChildFactory::makeChildren(first, first + size, idx);
+    Node<ValFromIter<Iter>> parent(idx, *(first + idx));
+
+    std::vector<decltype(parent)> parentAndChildren{parent};
+    if (children.first) parentAndChildren.push_back(children.first);
+    if (children.second) parentAndChildren.push_back(children.second);
+
+    auto max = getMaxEl(parentAndChildren.begin(), parentAndChildren.end(), childBiggerVal);
+    if (max.index() != parent.index())
+    {
+        std::swap(max.get(), parent.get());
+        pushDownMaxHeap(first, size, max.index(), comp);
+    }
+}
+
+/*
+template<typename Iter, typename Comp>
+void makeHeapMax(
+    Iter first,
+    long size,
+    long idx,
+    Comp comp)
+{
+    auto childBiggerVal = 
+        [](const auto& c1, const auto& c2)
+        {
+            return c1.get() > c2.get();
+        };
+
+    if (idx >= size)
+        return;
+    
+    auto iter = first;
+    std::advance(iter, idx);
+    auto& el = *iter;
+
+    auto children = ChildFactory::makeChildren(first, size, idx);
+    if (children.first)
+    {
+        makeHeapMax(first, size, children.first.index(), comp);
+        if (children.second)
+        {
+            makeHeapMax(first, size, children.second.index(), comp);
+            Node<ValFromIter<Iter>> parent(idx, el);
+            auto& max = getMaxEl(
+                childBiggerVal,
+                parent, 
+                children.first, 
+                children.second);
+            
+            if (max.index() != idx)
+            {
+                std::swap(el, max.get());
+                pushDownMaxHeap(first, size, max.index(), comp);
+            }
+        }
+        else
+        {
+            Node<ValFromIter<Iter>> parent(idx, el);
+            auto& max = getMaxEl(
+                childBiggerVal,
+                parent,
+                children.first);
+            
+            if (max.index() != idx)
+            {
+                std::swap(el, max.get());
+                pushDownMaxHeap(first, size, max.index(), comp);
+            }
+        }
+    }
+}
+*/
+
+template<typename Iter, typename Comp>
+void makeHeapMax(Iter first, long size, long idx, Comp comp)
+{
+    auto childBiggerVal = 
+        [&](const auto& c1, const auto& c2)
+        {
+            return comp(c1.get(), c2.get());
+        };
+
+    if (idx >= size)
+        return;
+    
+    auto children = ChildFactory::makeChildren(first, first+size, idx);
+    
+    if (children.first)
+        makeHeapMax(first, size, children.first.index(), comp);
+    if (children.second)
+        makeHeapMax(first, size, children.second.index(), comp);  
+    
+    children = ChildFactory::makeChildren(first, first+size, idx);
+    Node<ValFromIter<Iter>> parent(idx, *(first + size));
+    
+    std::vector<decltype(parent)> parentAndChildren{parent};
+    if (children.first) parentAndChildren.push_back(children.first);
+    if (children.second) parentAndChildren.push_back(children.second);
+
+    auto max = getMaxEl(parentAndChildren.begin(), parentAndChildren.end(), childBiggerVal);
+    if (max.index() != parent.index())
+    {
+        std::swap(max.get(), parent.get());
+        pushDownMaxHeap(first, size, max.index(), comp);
+    }
+}
+
+template<typename Iter, typename Comp>
+void heap_sort_internal(
+    Iter first,
+    Iter end,
+    Comp comp)
+{
+    if(first == end)
+        return;
+
+    pushDownMaxHeap(first, std::distance(first, end), 0, comp);
+    std::swap(*first, *--end);
+    heap_sort_internal(first, end, comp);
+}
+
+template<typename Iter, typename Comp>
+void heap_sort(
+    Iter first, 
+    Iter end, 
+    Comp comp)
+{
+    if (first == end)
+        return;
+
+    auto size = std::distance(first, end);
+    makeHeapMax(first, size, 0, comp);
+    std::swap(*first, *--end);
+    heap_sort_internal(first, end, comp);
+}
+
+template<typename Iter>
+void heap_sort(
+    Iter first, 
+    Iter end)
+{
+    heap_sort(first, end, std::greater<ValFromIter<Iter>>());
+}    
 
 /*
 template<typename Iter, typename Comp>

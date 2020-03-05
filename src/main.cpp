@@ -19,7 +19,6 @@ void fillWithRandom(
      unsigned max = numeric_limits<unsigned>::max(),
      int offset = 0)
 {
-    vec.clear();
     vec.resize(count);
 
     for (long i=0; i<count; ++i)
@@ -34,9 +33,6 @@ void fillWithSomewhatSorted(vector<int>& vec, long count, unsigned max, double p
     fillWithRandom(vec, count, max, 0);
 
     auto end = vec.end() - (unsigned) (vec.size() * (1 - percentageSorted));
-
-    if (end < vec.begin())
-        throw std::runtime_error("");
 
     std::sort(vec.begin(), end);
 }
@@ -59,21 +55,66 @@ void test_merge_sort()
 
     Timer timer(std::cout, "TimerMergeSort");
     merge_sort(vec.begin(), vec.end());
-    timer.printNow();
+    timer.printNow("Random");
 
     fillWithSomewhatSorted(vec, pow(10, 6), numeric_limits<int>::max(), 0.997);
     timer.reset();
-    quick_sort(vec.begin(), vec.end());
-    timer.printNow();
+    merge_sort(vec.begin(), vec.end());
+    timer.printNow("99.7\% sorted");
 
-    fillWithSomewhatSorted(vec, pow(10, 6), numeric_limits<int>::max(), 0.997);
+    fillWithSomewhatSorted(vec, pow(10, 6), numeric_limits<int>::max(), 0.90);
     timer.reset();
-    quick_sort(vec.begin(), vec.end());
-    timer.printNow();
+    merge_sort(vec.begin(), vec.end());
+    timer.printNow("90\% sorted");
+
+    fillWithSomewhatSorted(vec, pow(10, 6), numeric_limits<int>::max(), 0.50);
+    timer.reset();
+    merge_sort(vec.begin(), vec.end());
+    timer.printNow("50\% sorted");
+}
+
+void test_heap_sort()
+{
+    vector<int> vec;
+    fillWithRandom(vec, pow(10, 6), numeric_limits<int>::max(), 0);
+    auto vec_test = vec;
+
+    Timer timer(cout, "TimerHeapSort");
+    heap_sort(vec.begin(), vec.end());
+    timer.printNow("Random");
+
+    std::sort(vec_test.begin(), vec_test.end());
+    std::cout << "Is good? " << std::equal(vec_test.begin(), vec_test.end(), vec.begin()) << std::endl;
+}
+
+bool isHeapMax(const vector<int>& vec, long idx)
+{
+    auto children = ChildFactory::makeChildren(vec.begin(), vec.end(), idx);
+    bool oneMax = false;
+    bool twoMax = false;
+
+    if(children.first)
+        oneMax = isHeapMax(vec, children.first.index());
+    else
+        oneMax = true;
+    
+    if(children.second)
+        twoMax = isHeapMax(vec, children.second.index());
+    else
+        twoMax = true;
+
+    return oneMax && twoMax;
 }
 
 
 int main()
 {
-    test_merge_sort();
+    //test_merge_sort();
+    //test_heap_sort();
+
+    vector<int> vec;
+    fillWithRandom(vec, pow(10,3));
+
+    makeHeapMax(vec.begin(), vec.size(), 0, std::greater<int>());
+    std::cout << "isHeapMax(): " << isHeapMax(vec, 0) << endl;
 }
