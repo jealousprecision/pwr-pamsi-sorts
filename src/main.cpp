@@ -73,6 +73,7 @@ void test_merge_sort()
     timer.printNow("50\% sorted");
 }
 
+/*
 void test_heap_sort()
 {
     vector<int> vec;
@@ -86,35 +87,23 @@ void test_heap_sort()
     std::sort(vec_test.begin(), vec_test.end());
     std::cout << "Is good? " << std::equal(vec_test.begin(), vec_test.end(), vec.begin()) << std::endl;
 }
-
-bool isHeapMax(const vector<int>& vec, long idx)
-{
-    auto children = ChildFactory::makeChildren(vec.begin(), vec.end(), idx);
-    bool oneMax = false;
-    bool twoMax = false;
-
-    if(children.first)
-        oneMax = isHeapMax(vec, children.first.index());
-    else
-        oneMax = true;
-    
-    if(children.second)
-        twoMax = isHeapMax(vec, children.second.index());
-    else
-        twoMax = true;
-
-    return oneMax && twoMax;
-}
+*/
 
 
 int main()
 {
     //test_merge_sort();
     //test_heap_sort();
-
+    srand(time(nullptr));
     vector<int> vec;
-    fillWithRandom(vec, pow(10,3));
+    fillWithRandom(vec);
+    auto vec_cp = vec;
 
-    makeHeapMax(vec.begin(), vec.size(), 0, std::greater<int>());
-    std::cout << "isHeapMax(): " << isHeapMax(vec, 0) << endl;
+    std::sort(vec_cp.begin(), vec_cp.end());
+
+    Timer timer(cout, "heapSort");
+    heap_sort(vec.data(), vec.size());
+    timer.printNow();
+
+    cout << "Is good: " << std::equal(vec_cp.begin(), vec_cp.end(), vec.begin()) << endl;
 }
