@@ -16,7 +16,7 @@
 template<typename Iter, typename Comp>
 void merge(Iter first, Iter halfRangeEnd, Iter end, Comp comp)
 {
-    std::vector<GET_VAL_T_FROM_ITER_T(Iter)> temp;
+    std::vector<ValFromIter<Iter>> temp;
     temp.resize(std::distance(first, end));
 
     auto halfRangeIt = halfRangeEnd;
@@ -63,7 +63,7 @@ void merge_sort(Iter first, Iter end, Comp comp)
 template<typename Iter>
 void merge_sort(Iter it, Iter end)
 {
-    merge_sort(it, end, std::greater<GET_VAL_T_FROM_ITER_T(Iter)>());
+    merge_sort(it, end, std::greater<ValFromIter<Iter>>());
 }
 
 template<typename Iter, typename Comp>
@@ -73,7 +73,7 @@ void quick_sort(Iter first, Iter end, Comp comp)
     if (size <= 1)
         return;
 
-    std::vector<GET_VAL_T_FROM_ITER_T(Iter)> temp;
+    std::vector<ValFromIter<Iter>> temp;
     temp.resize(size);
 
     auto tempIt = first;
@@ -82,7 +82,7 @@ void quick_sort(Iter first, Iter end, Comp comp)
 
     auto firstIt = temp.begin();
     auto endIt = temp.end();
-    auto insertEl = [&](const GET_VAL_T_FROM_ITER_T(Iter)& el)
+    auto insertEl = [&](const ValFromIter<Iter>& el)
         {
             if (comp(key, el))
                 *firstIt++ = el;
@@ -104,7 +104,7 @@ void quick_sort(Iter first, Iter end, Comp comp)
 template<typename Iter>
 void quick_sort(Iter first, Iter end)
 {
-    quick_sort(first, end, std::greater<GET_VAL_T_FROM_ITER_T(Iter)>());
+    quick_sort(first, end, std::greater<ValFromIter<Iter>>());
 }
 
 void push_down(int arr[], int size, int idx)
