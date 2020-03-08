@@ -107,33 +107,60 @@ void quick_sort(Iter first, Iter end)
     quick_sort(first, end, std::greater<ValFromIter<Iter>>());
 }
 
-void push_down(int arr[], int size, int idx)
+template<typename T, typename Comp>
+void push_down(T arr[], size_t size, size_t idx, Comp comp)
 {
     int largest = idx;
     int l = 2*idx + 1;
     int r = 2*idx + 2;
 
-    if (l < size && arr[l] > arr[largest])
+    if (l < size && comp(arr[l], arr[largest]))
         largest = l;
     
-    if (r < size && arr[r] > arr[largest])
+    if (r < size && comp(arr[r], arr[largest]))
         largest = r;
     
     if (largest != idx)
     {
         std::swap(arr[idx], arr[largest]);
-        push_down(arr, size, largest);
+        push_down(arr, size, largest, comp);
     }
 }
 
-void heap_sort(int arr[], int size)
+template<typename T, typename Comp>
+void heap_sort(T arr[], size_t size, Comp comp)
 {
     for (int i = size/2 - 1; i >= 0; i--)
-        push_down(arr, size, i);
+        push_down(arr, size, i, comp);
 
     for (int i = size - 1; i >= 0; i--)
     {
         std::swap(arr[0], arr[i]);
-        push_down(arr, i, 0);
+        push_down(arr, i, 0, comp);
     }
-}   
+}
+
+template<typename T>
+void heap_sort(T arr[], size_t size)
+{
+    heap_sort(arr, size, std::greater<T>());
+}
+
+template<typename Iter, typename Comp>
+void heap_sort(Iter first, Iter end, Comp comp)
+{
+    std::vector<ValFromIter<Iter>> arr;
+    size_t size = std::distance(first, end);
+    arr.resize(size);
+    std::copy(first, end, arr.begin());
+
+    heap_sort(arr.data(), size, comp);
+
+    std::copy(arr.begin(), arr.end(), first);
+}
+
+template<typename Iter>
+void heap_sort(Iter first, Iter end)
+{
+    heap_sort(first, end, std::greater<ValFromIter<Iter>>());
+}
