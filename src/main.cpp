@@ -34,7 +34,7 @@ void fillWithRandom(
 {
     cont.clear();
 
-    generateNElements(std::back_inserter(cont), count, 
+    generateNElements(std::back_inserter(cont), count,
         [&]()
         {
             return rand() % max + offset;
@@ -50,7 +50,7 @@ void fillWithSomewhatSorted(
 {
     if (percentageSorted > 1.0)
         throw std::runtime_error("fillWithSomewhatSorted(): Wrong percentage");
-    
+
     fillWithRandom(cont, count, max);
     auto end = cont.end() - static_cast<unsigned>(cont.size() * (1 - percentageSorted));
     std::sort(cont.begin(), cont);
@@ -66,7 +66,7 @@ void test_sorterSorts(SortAbstract::Sorts sortType)
     for (int i = 0; i < 100; ++i)
     {
         fillWithRandom(vec, pow(10, 5));
-        
+
         vec_sorted = vec;
         std::sort(vec_sorted.begin(), vec_sorted.end());
 
@@ -79,7 +79,7 @@ void test_sorterSorts(SortAbstract::Sorts sortType)
         }
     }
 
-    std::cout << "test_sorterSorts(): sort: [" << SortAbstract::toString(sortType) << "] passed :" << passed << std::endl;
+    std::cout << "test_sorterSorts(): sort: [" << SortAbstract::toString(sortType) << "] passed: " << passed << std::endl;
 }
 
 void test_sorterPerformance(SortAbstract::Sorts sort)
@@ -101,8 +101,8 @@ void test_sorterPerformance(SortAbstract::Sorts sort)
     unsigned max = *std::max_element(durations.begin(), durations.end());
     double avg = std::accumulate(durations.begin(), durations.end(), 0.0) / durations.size();
 
-    cout << "test_sorterPerformance() : " << SortAbstract::toString(sort) 
-        << "\n\tMax: " << max / pow(10, 3) 
+    cout << "test_sorterPerformance() : " << SortAbstract::toString(sort)
+        << "\n\tMax: " << max / pow(10, 3)
         << " ms\n\tMin: " << min / pow(10, 3)
         << " ms\n\tAverage: " << avg / pow(10, 3) << " ms" << endl;
 }
@@ -111,7 +111,7 @@ void test_sorterWorksWithLists(SortAbstract::Sorts sort)
 {
     list<int> lst;
     vector<int> vec_sorted;
-    size_t size = pow(10, 6);
+    size_t size = pow(10, 5);
 
     fillWithRandom(lst, size);
 
@@ -123,7 +123,33 @@ void test_sorterWorksWithLists(SortAbstract::Sorts sort)
     SortAbstract::sortRange(sort, lst.begin(), lst.end());
     timer.printNow();
 
-    std::cout << "test_sorterWorksWithLists(): sort: [" << SortAbstract::toString(sort) << "] passed: " << std::equal(vec_sorted.begin(), vec_sorted.end(), lst.begin()) << std::endl;
+    std::cout << "test_sorterWorksWithLists(): sort: [" << SortAbstract::toString(sort) << "] passed: "
+        << std::equal(vec_sorted.begin(), vec_sorted.end(), lst.begin()) << std::endl;
+}
+
+void test_sorterWorksWithComparators(SortAbstract::Sorts sort)
+{
+    vector<int> vec;
+    fillWithRandom(vec);
+    vector<int> vec_sorted(vec);
+
+    auto smallerIntMyComp =
+        [](int i, int j)
+        {
+            return i < j;
+        };
+
+    auto smallerIntStlComp =
+        [](int i, int j)
+        {
+            return i > j;
+        };
+
+    std::sort(vec_sorted.begin(), vec_sorted.end(), smallerIntStlComp);
+    SortAbstract::sortRange(sort, vec.begin(), vec.end(), smallerIntMyComp);
+
+    std::cout << "test_sorterWorksWithComparators(): sort: [" << SortAbstract::toString(sort) << "] passed: "
+        << std::equal(vec_sorted.begin(), vec_sorted.end(), vec.begin()) << std::endl;
 }
 
 class TestRunner
@@ -131,7 +157,9 @@ class TestRunner
 public:
     using test_t = void (*)(SortAbstract::Sorts);
 
-    TestRunner(std::vector<test_t> tests, std::vector<SortAbstract::Sorts> sorts) :
+    TestRunner(
+        std::vector<test_t> tests,
+        std::vector<SortAbstract::Sorts> sorts) :
         tests_(tests), sorts_(sorts)
     {}
 
@@ -142,7 +170,7 @@ public:
                 test(sort);
     }
 
-private:   
+private:
     std::vector<test_t> tests_;
     std::vector<SortAbstract::Sorts> sorts_;
 };
@@ -150,8 +178,8 @@ private:
 int main()
 {
     TestRunner testRunner(
-        {test_sorterSorts, test_sorterWorksWithLists, test_sorterPerformance},
-        {SortAbstract::Sorts::merge, SortAbstract::Sorts::heap, SortAbstract::Sorts::quick});
-    
+        {test_sorterSorts, test_sorterPerformance, test_sorterWorksWithLists, test_sorterWorksWithComparators},
+        {SortAbstract::Sorts::heap, SortAbstract::Sorts::heap_slow});
+
     testRunner.run();
 }
