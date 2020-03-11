@@ -53,4 +53,14 @@ void merge(Iter first, Iter halfRangeEnd, Iter end, Comp comp)
     std::copy(temp.begin(), temp.end(), first);
 }
 
+template<typename InsertIt, typename Gen>
+void generate_n_el(
+    InsertIt It,
+    long count,
+    Gen gen)
+{
+    for (long i = 0; i < count; ++i)
+        *It++ = gen();
+}
+
 }  // namespace algo

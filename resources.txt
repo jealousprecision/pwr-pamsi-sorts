@@ -1,1 +1,3 @@
 https://www.geeksforgeeks.org/fundamentals-of-algorithms/
+https://www.geeksforgeeks.org/introsort-or-introspective-sort/
+https://www.geeksforgeeks.org/know-your-sorting-algorithm-set-2-introsort-cs-sorting-weapon/

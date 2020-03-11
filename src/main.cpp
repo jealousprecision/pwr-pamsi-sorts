@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
-#include <cstdio>
 
 #include <algorithm>
 #include <iostream>
@@ -17,16 +16,6 @@
 
 using namespace std;
 
-template<typename InsertIt, typename Gen>
-void generateNElements(
-    InsertIt It,
-    long count,
-    Gen gen)
-{
-    for (long i = 0; i < count; ++i)
-        *It++ = gen();
-}
-
 template<typename Cont>
 void fillWithRandom(
     Cont& cont,
@@ -36,7 +25,7 @@ void fillWithRandom(
 {
     cont.clear();
 
-    generateNElements(std::back_inserter(cont), count,
+    algo::generate_n_el(std::back_inserter(cont), count,
         [&]()
         {
             return rand() % max + offset;
@@ -191,6 +180,8 @@ using PrintTools::prettyPrint;
 
 int main()
 {
+    srand(time(nullptr));
+
     TestRunner testRunner(
         {
             test_sorterSorts,
