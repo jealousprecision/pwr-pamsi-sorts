@@ -10,37 +10,7 @@
 #include <utility>
 
 #include <SortsMacros.hpp>
-
-template<typename Iter, typename Comp>
-void merge(Iter first, Iter halfRangeEnd, Iter end, Comp comp)
-{
-    std::vector<ValFromIter<Iter>> temp;
-    temp.resize(std::distance(first, end));
-
-    auto halfRangeIt = halfRangeEnd;
-    auto it = first;
-    auto inserterIt = temp.begin();
-    while (true)
-    {
-        if (it == halfRangeEnd)
-        {
-            std::copy(halfRangeIt, end, inserterIt);
-            break;
-        }
-        if (halfRangeIt == end)
-        {
-            std::copy(it, halfRangeEnd, inserterIt);
-            break;
-        }
-
-        if (comp(*it, *halfRangeIt))
-            *inserterIt++ = *halfRangeIt++;
-        else
-            *inserterIt++ = *it++;
-    }
-
-    std::copy(temp.begin(), temp.end(), first);
-}
+#include <Algo.hpp>
 
 template<typename Iter, typename Comp>
 void merge_sort(Iter first, Iter end, Comp comp)
@@ -54,7 +24,7 @@ void merge_sort(Iter first, Iter end, Comp comp)
     merge_sort(first, halfRangeEnd, comp);
     merge_sort(halfRangeEnd, end, comp);
 
-    merge(first, halfRangeEnd, end, comp);
+    algo::merge(first, halfRangeEnd, end, comp);
 }
 
 template<typename Iter>
@@ -66,35 +36,20 @@ void merge_sort(Iter it, Iter end)
 template<typename Iter, typename Comp>
 void quick_sort(Iter first, Iter end, Comp comp)
 {
-    auto size = std::distance(first, end);
-    if (size <= 1)
+    if (first == end)
         return;
 
-    std::vector<ValFromIter<Iter>> temp;
-    temp.resize(size);
-
-    auto keyIt = std::next(first, size / 2);
+    auto keyIt = std::next(first, std::distance(first, end) / 2);
     auto key = *keyIt;
+    auto predicate = [&](const ValFromIter<Iter>& el) { return comp(key, el); };
 
-    auto firstIt = temp.begin();
-    auto endIt = temp.end();
-    auto insertEl = [&](const ValFromIter<Iter>& el)
-        {
-            if (comp(key, el))
-                *firstIt++ = el;
-            else
-                *--endIt = el;
-        };
+    auto preEnd = std::next(end, -1);
+    std::swap(*keyIt, *preEnd);
+    auto it = algo::partition(first, preEnd, predicate);
+    std::rotate(it, preEnd, end);
 
-    std::for_each(first, keyIt, insertEl);
-    std::for_each(++keyIt, end, insertEl);
-
-    *firstIt = key;
-
-    quick_sort(temp.begin(), firstIt, comp);
-    quick_sort(endIt, temp.end(), comp);
-
-    std::copy(temp.begin(), temp.end(), first);
+    quick_sort(first, it, comp);
+    quick_sort(std::next(it, 1), end, comp);
 }
 
 template<typename Iter>
@@ -128,17 +83,18 @@ void push_down_slow(Iter rootIt, size_t size, size_t idx, Comp comp)
 {
     auto largest = rootIt;
     auto largestIdx = idx;
+    auto end = std::next(rootIt, size);
 
-    auto lIt = std::next(rootIt, idx + 1);
-    auto rIt = std::next(lIt, 1);
+    auto lIt = 2 * idx + 1 < size ? std::next(rootIt, idx + 1) : end;
+    auto rIt = 2 * idx + 2 < size ? std::next(lIt, 1) : end;
 
-    if (2 * idx + 1 < size && comp(*lIt, *largest))
+    if (lIt != end && comp(*lIt, *largest))
     {
         largest = lIt;
         largestIdx = 2 * idx + 1;
     }
 
-    if (2 * idx + 2 < size && comp(*rIt, *largest))
+    if (rIt != end && comp(*rIt, *largest))
     {
         largest = rIt;
         largestIdx = 2 * idx + 2;

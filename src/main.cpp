@@ -12,6 +12,7 @@
 #include <SortAbstract.hpp>
 #include <PrintTools.hpp>
 #include <Timer.hpp>
+#include <Algo.hpp>
 
 using namespace std;
 
@@ -155,7 +156,7 @@ void test_sorterWorksWithComparators(SortAbstract::Sorts sort)
 class TestRunner
 {
 public:
-    using test_t = void (*)(SortAbstract::Sorts);
+    using test_t = std::function<void(SortAbstract::Sorts)>;
 
     TestRunner(
         std::vector<test_t> tests,
@@ -175,11 +176,22 @@ private:
     std::vector<SortAbstract::Sorts> sorts_;
 };
 
+using PrintTools::prettyPrint;
+
 int main()
 {
     TestRunner testRunner(
-        {test_sorterSorts, test_sorterPerformance, test_sorterWorksWithLists, test_sorterWorksWithComparators},
-        {SortAbstract::Sorts::heap, SortAbstract::Sorts::heap_slow});
+        {
+            test_sorterSorts,
+            test_sorterPerformance,
+            //test_sorterWorksWithLists,
+            test_sorterWorksWithComparators
+        },
+        {
+            //SortAbstract::Sorts::quick,
+            //SortAbstract::Sorts::merge,
+            SortAbstract::Sorts::heap_slow
+        });
 
     testRunner.run();
 }
