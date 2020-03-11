@@ -44,7 +44,7 @@ void merge(Iter first, Iter halfRangeEnd, Iter end, Comp comp)
             break;
         }
 
-        if (comp(*it, *halfRangeIt))
+        if (comp(*halfRangeIt, *it))
             *inserterIt++ = *halfRangeIt++;
         else
             *inserterIt++ = *it++;

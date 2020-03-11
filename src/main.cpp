@@ -30,7 +30,7 @@ template<typename Cont>
 void fillWithRandom(
     Cont& cont,
     long count = pow(10, 6),
-    unsigned max = numeric_limits<int>::max(),
+    int max = numeric_limits<int>::max(),
     int offset = 0)
 {
     cont.clear();
@@ -110,6 +110,12 @@ void test_sorterPerformance(SortAbstract::Sorts sort)
 
 void test_sorterWorksWithLists(SortAbstract::Sorts sort)
 {
+    if (sort == SortAbstract::Sorts::heap)
+    {
+        std::cerr << "test_sorterWorksWithLists(): sort: [HeapSort], skipping" << std::endl;
+        return;
+    }
+
     list<int> lst;
     vector<int> vec_sorted;
     size_t size = pow(10, 5);
@@ -120,11 +126,9 @@ void test_sorterWorksWithLists(SortAbstract::Sorts sort)
     std::copy(lst.begin(), lst.end(), std::back_inserter(vec_sorted));
     std::sort(vec_sorted.begin(), vec_sorted.end());
 
-    Timer timer(cout, std::string() + SortAbstract::toString(sort) + ": list");
     SortAbstract::sortRange(sort, lst.begin(), lst.end());
-    timer.printNow();
 
-    std::cout << "test_sorterWorksWithLists(): sort: [" << SortAbstract::toString(sort) << "] passed: "
+    std::cout << "test_sorterWorksWithLists(): sort: [" << SortAbstract::toString(sort) << "], passed: "
         << std::equal(vec_sorted.begin(), vec_sorted.end(), lst.begin()) << std::endl;
 }
 
@@ -134,20 +138,10 @@ void test_sorterWorksWithComparators(SortAbstract::Sorts sort)
     fillWithRandom(vec);
     vector<int> vec_sorted(vec);
 
-    auto smallerIntMyComp =
-        [](int i, int j)
-        {
-            return i < j;
-        };
+    auto descending = [](int i, int j) { return i > j; };
 
-    auto smallerIntStlComp =
-        [](int i, int j)
-        {
-            return i > j;
-        };
-
-    std::sort(vec_sorted.begin(), vec_sorted.end(), smallerIntStlComp);
-    SortAbstract::sortRange(sort, vec.begin(), vec.end(), smallerIntMyComp);
+    std::sort(vec_sorted.begin(), vec_sorted.end(), descending);
+    SortAbstract::sortRange(sort, vec.begin(), vec.end(), descending);
 
     std::cout << "test_sorterWorksWithComparators(): sort: [" << SortAbstract::toString(sort) << "] passed: "
         << std::equal(vec_sorted.begin(), vec_sorted.end(), vec.begin()) << std::endl;
@@ -184,13 +178,13 @@ int main()
         {
             test_sorterSorts,
             test_sorterPerformance,
-            //test_sorterWorksWithLists,
+            test_sorterWorksWithLists,
             test_sorterWorksWithComparators
         },
         {
-            //SortAbstract::Sorts::quick,
-            //SortAbstract::Sorts::merge,
-            SortAbstract::Sorts::heap_slow
+            SortAbstract::Sorts::quick,
+            SortAbstract::Sorts::merge,
+            SortAbstract::Sorts::heap
         });
 
     testRunner.run();
