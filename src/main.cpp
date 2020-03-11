@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include <cstdio>
 
 #include <algorithm>
 #include <iostream>
@@ -61,9 +62,20 @@ void test_sorterSorts(SortAbstract::Sorts sortType)
 {
     vector<int> vec;
     vector<int> vec_sorted;
-
     bool passed = true;
+    auto logCompletion =
+        [&](int percent)
+        {
+            std::cout << "test_sorterSorts(): sort: [" << SortAbstract::toString(sortType)
+                << "]: Completed: " << percent << "\%\n";
+        };
+    auto resetLine =
+        []()
+        {
+            std::cout << "\033[F";
+        };
 
+    logCompletion(0);
     for (int i = 0; i < 100; ++i)
     {
         fillWithRandom(vec, pow(10, 5));
@@ -73,14 +85,19 @@ void test_sorterSorts(SortAbstract::Sorts sortType)
 
         SortAbstract::sortRange(sortType, vec.begin(), vec.end());
 
+        resetLine();
+        logCompletion(i);
+
         if (!std::equal(vec_sorted.begin(), vec_sorted.end(), vec.begin()))
         {
             passed = false;
             break;
         }
     }
+    resetLine();
 
-    std::cout << "test_sorterSorts(): sort: [" << SortAbstract::toString(sortType) << "] passed: " << passed << std::endl;
+    std::cout << "test_sorterSorts(): sort: [" << SortAbstract::toString(sortType)
+        << "] passed: " << passed << std::string(6, ' ') << std::endl;
 }
 
 void test_sorterPerformance(SortAbstract::Sorts sort)
@@ -89,7 +106,7 @@ void test_sorterPerformance(SortAbstract::Sorts sort)
     Timer timer;
     vector<unsigned> durations;
 
-    for (int i = 0; i < static_cast<int>(pow(10, 3)); ++i)
+    for (int i = 0; i < pow(10, 2); ++i)
     {
         fillWithRandom(vec, pow(10, 5));
 
