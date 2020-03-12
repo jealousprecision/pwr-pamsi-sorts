@@ -14,13 +14,15 @@
 #include <Timer.hpp>
 #include <Algo.hpp>
 
-using namespace std;
+using std::cout;
+using std::endl;
+//using std::vector;
 
 template<typename Cont>
 void fillWithRandom(
     Cont& cont,
     long count = pow(10, 6),
-    int max = numeric_limits<int>::max(),
+    int max = std::numeric_limits<int>::max(),
     int offset = 0)
 {
     cont.clear();
@@ -36,7 +38,7 @@ template<typename Cont>
 void fillWithSomewhatSorted(
     Cont& cont,
     long count = pow(10, 6),
-    unsigned max = numeric_limits<int>::max(),
+    unsigned max = std::numeric_limits<int>::max(),
     double percentageSorted = 0.0)
 {
     if (percentageSorted > 1.0)
@@ -49,8 +51,8 @@ void fillWithSomewhatSorted(
 
 void test_sorterSorts(SortAbstract::Sorts sortType)
 {
-    vector<int> vec;
-    vector<int> vec_sorted;
+    std::vector<int> vec;
+    std::vector<int> vec_sorted;
     bool passed = true;
     auto logCompletion =
         [&](int percent)
@@ -91,9 +93,9 @@ void test_sorterSorts(SortAbstract::Sorts sortType)
 
 void test_sorterPerformance(SortAbstract::Sorts sort)
 {
-    vector<int> vec;
+    std::vector<int> vec;
     Timer timer;
-    vector<unsigned> durations;
+    std::vector<unsigned> durations;
 
     for (int i = 0; i < pow(10, 2); ++i)
     {
@@ -122,8 +124,8 @@ void test_sorterWorksWithLists(SortAbstract::Sorts sort)
         return;
     }
 
-    list<int> lst;
-    vector<int> vec_sorted;
+    std::list<int> lst;
+    std::vector<int> vec_sorted;
     size_t size = pow(10, 5);
 
     fillWithRandom(lst, size);
@@ -140,9 +142,9 @@ void test_sorterWorksWithLists(SortAbstract::Sorts sort)
 
 void test_sorterWorksWithComparators(SortAbstract::Sorts sort)
 {
-    vector<int> vec;
+    std::vector<int> vec;
     fillWithRandom(vec);
-    vector<int> vec_sorted(vec);
+    std::vector<int> vec_sorted(vec);
 
     auto descending = [](int i, int j) { return i > j; };
 
@@ -176,8 +178,6 @@ private:
     std::vector<SortAbstract::Sorts> sorts_;
 };
 
-using PrintTools::prettyPrint;
-
 int main()
 {
     srand(time(nullptr));
@@ -185,8 +185,8 @@ int main()
     TestRunner testRunner(
         {
             test_sorterSorts,
-            test_sorterPerformance,
-            test_sorterWorksWithLists,
+            //test_sorterPerformance,
+            //test_sorterWorksWithLists,
             test_sorterWorksWithComparators
         },
         {
