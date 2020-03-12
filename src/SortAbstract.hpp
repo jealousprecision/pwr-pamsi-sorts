@@ -12,7 +12,8 @@ public:
         merge,
         quick,
         heap,
-        insert
+        insert,
+        intro
     };
 
     static std::string toString(Sorts sort)
@@ -27,6 +28,8 @@ public:
             return "HeapSort";
         case Sorts::insert:
             return "InsertionSort";
+        case Sorts::intro:
+            return "IntrospectionSort";
         default:
             return "";
         }
@@ -48,6 +51,9 @@ public:
             break;
         case Sorts::insert:
             insert_sort(first, end, comp);
+            break;
+        case Sorts::intro:
+            intro_sort(first, end, comp);
             break;
         default:
             throw std::runtime_error("SortAbstract::sortRange(): sortType not found");

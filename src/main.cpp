@@ -97,7 +97,7 @@ void test_sorterPerformance(SortAbstract::Sorts sort)
 
     for (int i = 0; i < pow(10, 2); ++i)
     {
-        fillWithRandom(vec, pow(10, 5));
+        fillWithRandom(vec, pow(10, 6));
 
         timer.reset();
         SortAbstract::sortRange(sort, vec.begin(), vec.end());
@@ -192,7 +192,8 @@ int main()
         {
             SortAbstract::Sorts::quick,
             SortAbstract::Sorts::merge,
-            SortAbstract::Sorts::heap
+            SortAbstract::Sorts::heap,
+            SortAbstract::Sorts::intro
         });
 
     testRunner.run();

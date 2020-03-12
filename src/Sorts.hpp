@@ -11,6 +11,7 @@
 
 #include <SortsMacros.hpp>
 #include <Algo.hpp>
+#include <PrintTools.hpp>
 
 template<typename Iter, typename Comp>
 void merge_sort(Iter first, Iter end, Comp comp)
@@ -39,17 +40,16 @@ void quick_sort(Iter first, Iter end, Comp comp)
     if (first == end)
         return;
 
-    auto keyIt = std::next(first, std::distance(first, end) / 2);
-    auto key = *keyIt;
-    auto predicate = [&](const ValFromIter<Iter>& el) { return comp(el, key); };
-
     auto preEnd = std::next(end, -1);
-    std::swap(*keyIt, *preEnd);
+    auto& key = *std::next(first, std::distance(first, end) / 2);
+    auto predicate = [&comp, key](const ValFromIter<Iter>& el) { return comp(el, key); };
+
+    std::swap(key, *preEnd);
     auto it = algo::partition(first, preEnd, predicate);
     std::rotate(it, preEnd, end);
 
     quick_sort(first, it, comp);
-    quick_sort(std::next(it, 1), end, comp);
+    quick_sort(std::next(it), end, comp);
 }
 
 template<typename Iter>
@@ -130,4 +130,42 @@ void insert_sort(Iter first, Iter end, Comp comp)
             prev = std::next(it, -1);
         }
     }
+}
+
+using PrintTools::prettyPrint;
+
+template<typename Iter, typename Comp>
+void intro_sort(Iter first, Iter end, unsigned maxdepth, Comp comp)
+{
+    if (std::distance(first, end) <= 1)
+        return;
+
+    else if (maxdepth == 0)
+        heap_sort(first, end, comp);
+
+    else
+    {
+        auto preEnd = std::next(end, -1);
+        auto& key = *std::next(first, std::distance(first, end) / 2);
+        auto predicate = [&comp, key](const ValFromIter<Iter>& el) { return comp(el, key); };
+
+        std::swap(key, *preEnd);
+        //std::cout << prettyPrint(first, end) << std::endl;
+        auto it = algo::partition(first, preEnd, predicate);
+        //std::cout << prettyPrint(first, end) << std::endl;
+        std::rotate(it, preEnd, end);
+        //std::cout << prettyPrint(first, end) << std::endl;
+
+        //std::vector<ValFromIter<Iter>> test(first, end);
+
+        intro_sort(first, it, maxdepth - 1, comp);
+        intro_sort(std::next(it), end, maxdepth - 1, comp);
+    }
+}
+
+template<typename Iter, typename Comp>
+void intro_sort(Iter first, Iter end, Comp comp)
+{
+    auto maxdepth = log(std::distance(first, end)) * 2;
+    intro_sort(first, end, maxdepth, comp);
 }
