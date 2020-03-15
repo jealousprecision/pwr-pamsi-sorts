@@ -2,7 +2,7 @@
 
 #include <string>
 #include <stdexcept>
-#include <Sorts.hpp>
+#include <Sorts/Sorts.hpp>
 
 class SortAbstract
 {

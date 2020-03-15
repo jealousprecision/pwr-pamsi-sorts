@@ -16,17 +16,10 @@ public:
         start = std::chrono::steady_clock::now();
     }
 
-    inline void reset() { start = std::chrono::steady_clock::now(); }
-    inline auto checkNow() const { return std::chrono::steady_clock::now() - start; }
-    inline unsigned checkNowMs() const { return std::chrono::duration_cast<std::chrono::milliseconds>(checkNow()).count(); }
-    inline unsigned checkNowUs() const { return std::chrono::duration_cast<std::chrono::microseconds>(checkNow()).count(); }
-    void printNow(const std::string& msg = "") const
-    {
-        auto duration = checkNow();
-        os << "[" << name << "] printNow(): " << msg << ": " 
-            << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()
-            << " ms passed" << std::endl;
-    }
+    void reset() { start = std::chrono::steady_clock::now(); }
+    auto checkNow() const { return std::chrono::steady_clock::now() - start; }
+    unsigned checkNowMs() const { return std::chrono::duration_cast<std::chrono::milliseconds>(checkNow()).count(); }
+    unsigned checkNowUs() const { return std::chrono::duration_cast<std::chrono::microseconds>(checkNow()).count(); }
 
 protected:
     time_point start;

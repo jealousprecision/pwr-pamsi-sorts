@@ -1,6 +1,8 @@
 #pragma once
 
-#include <SortsMacros.hpp>
+#include <functional>
+#include <vector>
+#include <Sorts/SortsMacros.hpp>
 
 namespace algo
 {
@@ -71,6 +73,14 @@ void generate_n_el(InsertIt It, long count, Gen gen)
 {
     for (long i = 0; i < count; ++i)
         *It++ = gen();
+}
+
+constexpr size_t pow(size_t a, size_t b)
+{
+    size_t ret = 1;
+    for (int i = 0; i < b; ++i)
+        ret *= a;
+    return ret;
 }
 
 }  // namespace algo

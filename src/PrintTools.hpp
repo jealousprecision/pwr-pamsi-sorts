@@ -6,27 +6,6 @@
 namespace PrintTools
 {
 
-template<typename Container>
-void printContainer(
-    std::ostream& os,
-    const Container& container,
-    const std::string& deli,
-    const std::string& end)
-{
-    for (decltype(auto) el : container)
-        os << el << deli;
-
-    os << end;
-}
-
-template<typename Container>
-void printContainer(
-    std::ostream& os,
-    const Container& container)
-{
-    printContainer(os, container, ", ", "");
-}
-
 template<typename Iter>
 struct IterPrinter
 {
@@ -45,19 +24,13 @@ std::ostream& operator<<(std::ostream& os, const IterPrinter<Iter>& printer)
 template<typename Cont>
 struct ContPrinter
 {
-    ContPrinter(const Cont& cont) :
-        cont_(cont)
-    {}
-
-    ContPrinter(const ContPrinter&) = default;
-
-    const Cont& cont_;
+    const Cont& cont;
 };
 
 template<typename Cont>
 std::ostream& operator<<(std::ostream& os, const ContPrinter<Cont>& printer)
 {
-    for (const auto& el : printer.cont_)
+    for (const auto& el : printer.cont)
         os << el << ", ";
     return os;
 }
@@ -71,7 +44,27 @@ IterPrinter<Iter> prettyPrint(Iter first, Iter end)
 template<typename Cont>
 ContPrinter<Cont> prettyPrint(const Cont& cont)
 {
-    return ContPrinter<Cont>(cont);
+    return ContPrinter<Cont>{cont};
 }
+
+class LoadingBar
+{
+public:
+    LoadingBar(std::ostream& os, std::string text, unsigned max) :
+        os_(os), text_(text), max_(max)
+    {}
+
+    void start();
+    void markProgress(unsigned);
+    void end();
+
+private:
+    unsigned getPercent();
+
+    std::ostream& os_;
+    std::string text_;
+    unsigned max_;
+    unsigned progress_ = 0;
+};
 
 }  // namespace PrintTools
