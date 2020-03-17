@@ -1,4 +1,5 @@
 #pragma once
 
-#include "Tests.hpp"
-#include "TestRunner.hpp"
+#include "SimpleTests.hpp"
+#include "BasicTestFactory.hpp"
+#include "NewTestRunner.hpp"

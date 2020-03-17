@@ -7,32 +7,27 @@
 #include <Test/Test.hpp>
 #include <PrintTools.hpp>
 
+test::NewTestRunner::TestContainer getTests()
+{
+    test::NewTestRunner::TestContainer ret;
+
+    ret.emplace_back(new test::SortsCorrectlyTest());
+    ret.emplace_back(new test::WorksWithListsTest(100));
+
+    return ret;
+}
+
 int main()
 {
     srand(time(nullptr));
 
-    std::ofstream csvFile;
-    csvFile.open("testresults.csv");
-    if (!csvFile)
-        throw std::runtime_error("Can't open csv file");
-
-    test::TestRunner testRunner(
+    test::NewTestRunner testRunner(
+        std::make_unique<test::BasicTestFactory>(),
         {
-            //test::sorterSorts,
-            //test::sorterPerformance,
-            //test::sorterWorksWithLists,
-            //test::sorterWorksWithComparators
-            test::sorterExcercise
-        },
-        {
-            SortAbstract::Sorts::quick,
             SortAbstract::Sorts::merge,
-            //SortAbstract::Sorts::heap,
-            SortAbstract::Sorts::intro
+            SortAbstract::Sorts::intro,
+            SortAbstract::Sorts::quick
         });
 
     testRunner.run();
-
-    PrintTools::getSheetInstance()->dump(csvFile);
-    csvFile.close();
 }
