@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <numeric>
 #include <vector>
 #include <Sorts/SortsMacros.hpp>
 
@@ -81,6 +82,12 @@ constexpr size_t pow(size_t a, size_t b)
     for (int i = 0; i < b; ++i)
         ret *= a;
     return ret;
+}
+
+template<typename Iter, typename T>
+T average(Iter begin, Iter end, T firstValue)
+{
+    return std::accumulate(begin, end, firstValue) / std::distance(begin, end);
 }
 
 }  // namespace algo

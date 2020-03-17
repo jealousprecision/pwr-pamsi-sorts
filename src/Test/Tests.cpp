@@ -21,8 +21,6 @@ void fillWithRandom(
     int max = std::numeric_limits<int>::max(),
     int offset = 0)
 {
-    cont.clear();
-
     algo::generate_n_el(std::back_inserter(cont), count, [&](){return rand() % max + offset;});
 }
 
@@ -41,30 +39,16 @@ void fillWithSomewhatSorted(
     std::sort(cont.begin(), end);
 }
 
-struct PerformanceResult
+void fillSortedOpt(std::vector<int>& vec, double percentageSorted)
 {
-    unsigned min;
-    unsigned max;
-    unsigned avg;
-};
+    if (percentageSorted > 1.0)
+        throw std::runtime_error("fillSortedOpt(): wrong percentage");
 
-template<typename CCont>
-PerformanceResult testPerformance(SortAbstract::Sorts sort, CCont ccont)
-{
-    Timer timer;
-    std::vector<unsigned> durations;
-    for (auto& cont : ccont)
-    {
-        timer.reset();
-        SortAbstract::sortRange(sort, cont.begin(), cont.end());
-        durations.push_back(timer.checkNowUs());
-    }
+    for (int i = 0; i < vec.size(); ++i)
+        vec[i] = rand();
 
-    PerformanceResult ret;
-    ret.min = *std::min_element(durations.begin(), durations.end());
-    ret.max = *std::max_element(durations.begin(), durations.end());
-    ret.avg = std::accumulate(durations.begin(), durations.end(), 0.0) / durations.size();
-    return ret;
+    auto end = vec.end() - static_cast<unsigned>(vec.size() * (1 - percentageSorted));
+    std::sort(vec.begin(), end);
 }
 
 }  // namespace
@@ -128,7 +112,7 @@ void sorterPerformance(SortAbstract::Sorts sortType)
     unsigned max = *std::max_element(durations.begin(), durations.end());
     double avg = std::accumulate(durations.begin(), durations.end(), 0.0) / durations.size();
 
-    std::cout << testAndSortName << ":" //<< std::string(20, ' ')
+    std::cout << testAndSortName << ":"
             << "\n\tMax: " << max / pow(10, 3)
             << " ms\n\tMin: " << min / pow(10, 3)
             << " ms\n\tAverage: " << avg / pow(10, 3) << " ms" << std::endl;
@@ -176,24 +160,42 @@ void sorterWorksWithComparators(SortAbstract::Sorts sort)
 void sorterExcercise(SortAbstract::Sorts sort)
 {
     size_t testLengths[] = {algo::pow(10, 4), algo::pow(10, 4) * 5, algo::pow(10, 5), algo::pow(10, 5) * 5, algo::pow(10, 6)};
+    //size_t testLengths[] = {algo::pow(10, 4)};
     double sortedPercentage[] = {0.0, 0.25, 0.5, 0.75, 0.95, 0.99, 0.997};
+    //double sortedPercentage[] = {0.0};
+    constexpr size_t NOOFTESTS = 100;
+    Timer timer;
     std::string testname = "test_sorterExcercise(): sort: [" + SortAbstract::toString(sort) + "]: ";
 
     for (auto len : testLengths)
     {
-        std::vector<std::vector<int>> ccont;
-        ccont.resize(100);
-
+        auto testname_with_len = testname + "Length " + std::to_string(len) + ": ";
         for (auto percentage : sortedPercentage)
         {
-            for (auto& cont : ccont)
-                fillWithSomewhatSorted(cont, len, percentage);
+            auto testname_with_len_with_perc =
+                testname_with_len + "Sorted in " + PrintTools::to_string_with_precision(percentage * 100, 3) + "\%: ";
 
-            auto performance = testPerformance(sort, ccont);
-            std::cout << testname << percentage << "\%: Length: " << len
-                << "\n\tMax: " << performance.max / 1000.0 << " ms"
-                << "\n\tMin: " << performance.min / 1000.0 << " ms"
-                << "\n\tAvg: " << performance.avg / 1000.0 << " ms" << std::endl;
+            std::vector<int> cont;
+            cont.resize(len);
+            PrintTools::LoadingBar loadingBar(std::cout, testname_with_len_with_perc, NOOFTESTS);
+            auto row = PrintTools::getSheetInstance()->newRow();
+            row.setName(testname_with_len_with_perc);
+
+            loadingBar.start();
+            for (int i = 0; i < NOOFTESTS; ++i)
+            {
+                fillSortedOpt(cont, percentage);
+
+                timer.reset();
+                SortAbstract::sortRange(sort, cont.begin(), cont.end());
+                row->push_back(timer.checkNowUs());
+
+                loadingBar.markProgress(1);
+            }
+            loadingBar.end();
+
+            std::cout << testname_with_len_with_perc
+                << "Average " << algo::average(row->begin(), row->end(), 0.0) / 1000 << " ms: " << std::endl;
         }
     }
 

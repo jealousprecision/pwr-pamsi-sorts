@@ -1,5 +1,7 @@
 #include "PrintTools.hpp"
 
+#include <memory>
+
 namespace PrintTools
 {
 
@@ -12,7 +14,7 @@ constexpr auto deleteLine = "\033[2K\r";
 
 void LoadingBar::start()
 {
-    os_ << text_ << "0\%";
+    os_ << text_ << "0\%" << std::flush;
 }
 
 void LoadingBar::markProgress(unsigned u)
@@ -23,12 +25,18 @@ void LoadingBar::markProgress(unsigned u)
 
 void LoadingBar::end()
 {
-    os_ << deleteLine;
+    os_ << deleteLine << std::flush;
 }
 
 unsigned LoadingBar::getPercent()
 {
     return static_cast<double>(progress_) / max_ * 100;
+}
+
+std::shared_ptr<Sheet<unsigned>> getSheetInstance()
+{
+    static std::shared_ptr<Sheet<unsigned>> obj(new Sheet<unsigned>());
+    return obj;
 }
 
 }  // namespace PrintTools

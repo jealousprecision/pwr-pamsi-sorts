@@ -1,12 +1,20 @@
 #include <cstdlib>
 #include <ctime>
 
+#include <fstream>
+
 #include <Sorts/SortAbstract.hpp>
 #include <Test/Test.hpp>
+#include <PrintTools.hpp>
 
 int main()
 {
     srand(time(nullptr));
+
+    std::ofstream csvFile;
+    csvFile.open("testresults.csv");
+    if (!csvFile)
+        throw std::runtime_error("Can't open csv file");
 
     test::TestRunner testRunner(
         {
@@ -24,4 +32,7 @@ int main()
         });
 
     testRunner.run();
+
+    PrintTools::getSheetInstance()->dump(csvFile);
+    csvFile.close();
 }

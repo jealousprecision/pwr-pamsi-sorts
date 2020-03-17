@@ -1,7 +1,11 @@
 #pragma once
 
 #include <iostream>
+#include <iomanip>
+#include <memory>
 #include <string>
+#include <sstream>
+#include <vector>
 
 namespace PrintTools
 {
@@ -66,5 +70,93 @@ private:
     unsigned max_;
     unsigned progress_ = 0;
 };
+
+template<typename T>
+class Sheet : public std::enable_shared_from_this<Sheet<T>>
+{
+public:
+    class Row
+    {
+    public:
+        using value_type = T;
+
+        Row() = delete;
+        Row(std::shared_ptr<Sheet> parent, size_t idx) :
+            parent_(parent), idx_(idx)
+        {}
+
+        void setName(const std::string& newName)
+        {
+            parent_->data_[idx_].name = newName;
+        }
+
+        std::vector<T>& operator*() { return parent_->data_[idx_].data; }
+        std::vector<T>* operator->() { return &(parent_->data_[idx_].data); }
+
+    protected:
+        std::shared_ptr<Sheet<T>> parent_;
+        size_t idx_;
+    };
+
+    Sheet() = default;
+
+    Row newRow()
+    {
+        data_.push_back(InternalRow());
+        return Row(this->shared_from_this(), data_.size() - 1);
+    }
+
+    void dump(std::ostream& os)
+    {
+        for (auto& row : data_)
+            os << row.name << ",";
+
+        os << std::endl;
+
+        for (int y = 0; y < data_[0].data.size(); ++y)
+        {
+            for (int x = 0; x < data_.size(); ++x)
+                if (y < data_[x].data.size())
+                    os << data_[x].data[y] << ",";
+                else
+                    os << ",";
+
+            os << std::endl;
+        }
+    }
+
+protected:
+    struct InternalRow
+    {
+        std::string name = "";
+        std::vector<T> data;
+    };
+
+    std::vector<InternalRow> data_;
+};
+
+std::shared_ptr<Sheet<unsigned>> getSheetInstance();
+
+template<typename T>
+std::string to_string_with_precision(T t, size_t precision = 6)
+{
+    if (precision == 0)
+    {
+        size_t cnt = 0;
+        auto temp = t;
+
+        while (temp > 1)
+        {
+            temp /= 10;
+            cnt++;
+        }
+
+        precision = cnt;
+    }
+
+    std::stringstream sst;
+    sst << std::setprecision(precision) << t;
+    return sst.str();
+}
 
 }  // namespace PrintTools
