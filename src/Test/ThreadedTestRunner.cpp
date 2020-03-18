@@ -18,20 +18,20 @@ class ThreadEnvironment
 {
 public:
     ThreadEnvironment(ITestFactory::TestContainer tests, SortAbstract::Sorts sort) :
-        tests_(std::move(tests)), sort_(sort)
+        tests_(std::move(tests)), sort_(sort), isDone(new std::atomic<bool>(false))
     {}
 
     void operator() ()
     {
         for (auto& test : tests_)
             test->run(sort_);
-        isDone = true;
+        *isDone = true;
     }
 
     double getCompletion() const { return tests_.front()->completion(); }
     std::string testname() const { return SortAbstract::toString(sort_); }
 
-    bool isDone{false};
+    std::unique_ptr<std::atomic<bool>> isDone;
 
 protected:
     ITestFactory::TestContainer tests_;
@@ -53,7 +53,7 @@ void ThreadedTestRunner::run()
         threads.emplace_back(std::reference_wrapper<ThreadEnvironment>(env));
 
     std::cout << std::setprecision(3);
-    while (!std::all_of(envs.begin(), envs.end(), [](const auto& el){return el.isDone;}))
+    while (!std::all_of(envs.begin(), envs.end(), [](const auto& el)->bool{return *el.isDone;}))
     {
         for (const auto& env : envs)
             std::cout << env.testname() << ": " << env.getCompletion() << "|| ";
@@ -65,12 +65,6 @@ void ThreadedTestRunner::run()
 
     for (auto& thread : threads)
         thread.join();
-}
-
-void ThreadedTestRunner::runTestsOnOneSort(SortAbstract::Sorts sort)
-{
-    for (const auto& test : factory_.create())
-        test->run(sort);
 }
 
 }  // namespace test

@@ -16,8 +16,6 @@ public:
 
     void run() override;
 
-protected:
-    void runTestsOnOneSort(SortAbstract::Sorts);
 };
 
 }  // namespace test

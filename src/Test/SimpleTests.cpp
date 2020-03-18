@@ -12,18 +12,6 @@
 namespace test
 {
 
-namespace
-{
-
-template<typename Iter>
-void fillRandom(Iter iter, Iter end)
-{
-    for (; iter != end; ++iter)
-        *iter = std::rand();
-}
-
-}  // namespace
-
 double ITest::completion() const
 {
     throw std::runtime_error("ITest::completion(): method not implemented!");
@@ -39,7 +27,7 @@ void SortsCorrectlyTest::run(SortAbstract::Sorts sort)
 
     for (int i = 0; i < times_; ++i)
     {
-        fillRandom(vec.begin(), vec.end());
+        algo::fill_random(vec.begin(), vec.end());
         SortAbstract::sortRange(sort, vec.begin(), vec.end());
 
         if (!std::is_sorted(vec.begin(), vec.end()))
@@ -63,7 +51,7 @@ void WorksWithListsTest::run(SortAbstract::Sorts sort)
 
     for (int i = 0; i < times_; ++i)
     {
-        fillRandom(list.begin(), list.end());
+        algo::fill_random(list.begin(), list.end());
 
         timer.reset();
         SortAbstract::sortRange(sort, list.begin(), list.end());
