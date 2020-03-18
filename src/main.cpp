@@ -7,22 +7,13 @@
 #include <Test/Test.hpp>
 #include <PrintTools.hpp>
 
-test::NewTestRunner::TestContainer getTests()
-{
-    test::NewTestRunner::TestContainer ret;
-
-    ret.emplace_back(new test::SortsCorrectlyTest());
-    ret.emplace_back(new test::WorksWithListsTest(100));
-
-    return ret;
-}
-
 int main()
 {
     srand(time(nullptr));
 
-    test::NewTestRunner testRunner(
-        std::make_unique<test::BasicTestFactory>(),
+    test::MainTestFactory factory;
+    test::ThreadedTestRunner testRunner(
+        factory,
         {
             SortAbstract::Sorts::merge,
             SortAbstract::Sorts::intro,
@@ -30,4 +21,16 @@ int main()
         });
 
     testRunner.run();
+
+    auto sheets = factory.getSheets();
+    auto sheet = std::accumulate(sheets.begin() + 1, sheets.end(), sheets.front(),
+        [](const auto& ret, const auto& toSum)
+        {
+            (*ret) += (*toSum);
+            return ret;
+        });
+
+    std::ofstream csv("tests.csv");
+    sheet->dump(csv);
+    csv.close();
 }

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "ITest.hpp"
-
+#include <Test/ITest.hpp>
 #include <Algo.hpp>
 
 namespace test

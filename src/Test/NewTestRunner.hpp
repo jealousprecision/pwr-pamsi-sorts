@@ -12,16 +12,15 @@ namespace test
 class NewTestRunner
 {
 public:
-    using TestContainer = std::vector<std::unique_ptr<ITest>>;
-
-    NewTestRunner(std::unique_ptr<ITestFactory> factory, std::vector<SortAbstract::Sorts> sorts) :
-        factory_(std::move(factory)), sorts_(std::move(sorts))
+    NewTestRunner(ITestFactory& factory, std::vector<SortAbstract::Sorts> sorts) :
+        factory_(factory), sorts_(std::move(sorts))
     {}
+    virtual ~NewTestRunner() = default;
 
-    void run();
+    virtual void run();
 
 protected:
-    std::unique_ptr<ITestFactory> factory_;
+    ITestFactory& factory_;
     std::vector<SortAbstract::Sorts> sorts_;
 };
 

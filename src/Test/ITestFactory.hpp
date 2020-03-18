@@ -13,6 +13,8 @@ class ITestFactory
 public:
     using TestContainer = std::vector<std::unique_ptr<ITest>>;
 
+    virtual ~ITestFactory() = default;
+
     virtual TestContainer create() const = 0;
 };
 

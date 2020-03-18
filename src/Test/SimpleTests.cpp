@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <list>
+#include <stdexcept>
 #include <vector>
 
 #include <Timer.hpp>
@@ -22,6 +23,11 @@ void fillRandom(Iter iter, Iter end)
 }
 
 }  // namespace
+
+double ITest::completion() const
+{
+    throw std::runtime_error("ITest::completion(): method not implemented!");
+}
 
 void SortsCorrectlyTest::run(SortAbstract::Sorts sort)
 {
