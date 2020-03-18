@@ -11,28 +11,26 @@ int main()
 {
     srand(time(nullptr));
 
-    std::ofstream csvFile;
-    csvFile.open("testresults.csv");
-    if (!csvFile)
-        throw std::runtime_error("Can't open csv file");
-
-    test::TestRunner testRunner(
+    test::MainTestFactory factory;
+    test::ThreadedTestRunner testRunner(
+        factory,
         {
-            //test::sorterSorts,
-            //test::sorterPerformance,
-            //test::sorterWorksWithLists,
-            //test::sorterWorksWithComparators
-            test::sorterExcercise
-        },
-        {
-            SortAbstract::Sorts::quick,
             SortAbstract::Sorts::merge,
-            //SortAbstract::Sorts::heap,
-            SortAbstract::Sorts::intro
+            SortAbstract::Sorts::intro,
+            SortAbstract::Sorts::quick
         });
 
     testRunner.run();
 
-    PrintTools::getSheetInstance()->dump(csvFile);
-    csvFile.close();
+    auto sheets = factory.getSheets();
+    auto sheet = std::accumulate(sheets.begin() + 1, sheets.end(), sheets.front(),
+        [](const auto& ret, const auto& toSum)
+        {
+            (*ret) += (*toSum);
+            return ret;
+        });
+
+    std::ofstream csv("tests.csv");
+    sheet->dump(csv);
+    csv.close();
 }

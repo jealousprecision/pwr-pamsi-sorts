@@ -90,4 +90,11 @@ T average(Iter begin, Iter end, T firstValue)
     return std::accumulate(begin, end, firstValue) / std::distance(begin, end);
 }
 
+template<typename Iter>
+void fill_random(Iter iter, Iter end)
+{
+    for (; iter != end; ++iter)
+        *iter = rand();
+}
+
 }  // namespace algo

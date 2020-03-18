@@ -100,6 +100,12 @@ public:
 
     Sheet() = default;
 
+    Sheet& operator+= (const Sheet& other)
+    {
+        std::copy(other.data_.begin(), other.data_.end(), std::back_inserter(data_));
+        return *this;
+    }
+
     Row newRow()
     {
         data_.push_back(InternalRow());
