@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.05)
 set(CMAKE_CXX_STANDARD_REQUIRED 17)
 
 project(pamsi-sorts VERSION 1.0)
 
-find_package(Threads)
+find_package(Threads REQUIRED)
 
 add_executable(sorts
     ./src/main.cpp
