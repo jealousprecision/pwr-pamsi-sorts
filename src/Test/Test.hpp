@@ -6,5 +6,4 @@
 #include "BasicTestFactory.hpp"
 #include "MainTestFactory.hpp"
 
-#include "NewTestRunner.hpp"
-#include "ThreadedTestRunner.hpp"
+#include "TestRunner.hpp"

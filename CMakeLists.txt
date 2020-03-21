@@ -10,7 +10,7 @@ add_executable(sorts
     ./src/PrintTools.cpp
     ./src/Test/SimpleTests.cpp
     ./src/Test/MainTest.cpp
-    ./src/Test/NewTestRunner.cpp
+    ./src/Test/TestRunner.cpp
     ./src/Test/ThreadedTestRunner.cpp
     ./src/Test/BasicTestFactory.cpp
     ./src/Test/MainTestFactory.cpp)
