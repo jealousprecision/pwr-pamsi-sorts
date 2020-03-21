@@ -82,7 +82,6 @@ constexpr size_t maxThreads = 10u;
 
 void ThreadedTestRunner::run()
 {
-    constexpr auto deleteLine = "\033[2K";
     const auto isThreadDone = [](const std::unique_ptr<ThreadEnvironment>& env) { return env->isDone(); };
     const auto isAttached = [](const std::unique_ptr<ThreadEnvironment>& env) { return env->parent != nullptr; };
 
@@ -133,10 +132,9 @@ void ThreadedTestRunner::run()
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        const auto escape = "\033[A";
-        for (int j = 0; j < i; ++j)
-            std::cout << escape << deleteLine;
+        std::cout << std::flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::cout << PrintTools::deleteLine;
     }
 
     for (auto& thread : threads)

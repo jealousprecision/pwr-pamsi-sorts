@@ -5,12 +5,7 @@
 namespace PrintTools
 {
 
-namespace
-{
-
-constexpr auto deleteLine = "\033[2K\r";
-
-}  // namespace
+const char* deleteLine = "\033[2K\r";
 
 void LoadingBar::start()
 {

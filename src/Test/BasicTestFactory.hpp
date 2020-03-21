@@ -11,4 +11,4 @@ public:
     TestContainer create() const override;
 };
 
-}
+}  // namespace test

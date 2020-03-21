@@ -2,7 +2,7 @@
 #include <ctime>
 
 #include <fstream>
-#include <numeric>
+#include <vector>
 
 #include <Sorts/SortAbstract.hpp>
 #include <Test/Test.hpp>
@@ -20,7 +20,7 @@ int main()
     srand(time(nullptr));
 
     test::MainTestFactory factory(testsLength, arrayLengths, percentages);
-    test::ThreadedTestRunner testRunner(
+    test::TestRunner testRunner(
         factory,
         {
             SortAbstract::Sorts::merge,
@@ -38,4 +38,6 @@ int main()
     csv << "SEP=,\n"; // excel is dumb
     mainsheet.dump(csv);
     csv.close();
+
+    return 0;
 }

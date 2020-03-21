@@ -97,4 +97,11 @@ void fill_random(Iter iter, Iter end)
         *iter = rand();
 }
 
+template<typename Iter>
+void fill_random(Iter iter, Iter end, size_t max)
+{
+    for(; iter != end; ++iter)
+        *iter = rand() % max;
+}
+
 }  // namespace algo

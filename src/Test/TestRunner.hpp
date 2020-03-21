@@ -1,27 +1,27 @@
 #pragma once
 
-#include <memory>
 #include <vector>
+
 #include <Sorts/SortAbstract.hpp>
 #include <Test/ITest.hpp>
 #include <Test/ITestFactory.hpp>
+#include <Test/ITestRunner.hpp>
 
 namespace test
 {
 
-class NewTestRunner
+class TestRunner : public ITestRunner
 {
 public:
-    NewTestRunner(ITestFactory& factory, std::vector<SortAbstract::Sorts> sorts) :
+    TestRunner(ITestFactory& factory, std::vector<SortAbstract::Sorts> sorts) :
         factory_(factory), sorts_(std::move(sorts))
     {}
-    virtual ~NewTestRunner() = default;
 
-    virtual void run();
+    void run() override;
 
 protected:
     ITestFactory& factory_;
     std::vector<SortAbstract::Sorts> sorts_;
 };
 
-}
+}  // namespace test
