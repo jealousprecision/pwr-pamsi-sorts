@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Test/NewTestRunner.hpp>
+#include <Test/TestRunner.hpp>
 
 namespace test
 {

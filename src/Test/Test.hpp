@@ -7,3 +7,4 @@
 #include "MainTestFactory.hpp"
 
 #include "TestRunner.hpp"
+#include "ThreadedTestRunner.hpp"

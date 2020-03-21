@@ -10,32 +10,32 @@ ITestFactory::TestContainer MainTestFactory::create() const
 {
     sheets_.emplace_back();
     auto& sheet = sheets_.back();
-    TestContainer ret;
+    TestContainer tests;
 
     for (auto arrayLength : lengths_)
     {
         for (auto percentage : percentages_)
         {
-            ret.emplace_back(new SimpleMainTest(
+            tests.emplace_back(new SimpleMainTest(
                 testsLength_,
                 arrayLength,
                 SortedRangeMaker(percentage),
                 sheet,
-                "MainTest; " + PrintTools::to_string_with_precision(arrayLength, 4) + "; "
-                    + PrintTools::to_string_with_precision(percentage * 100, 4)
+                "MainTest; " + std::to_string(arrayLength) + "; "
+                    + PrintTools::to_string_with_precision(percentage * 100, 4) + '\%'
             ));
         }
 
-        ret.emplace_back(new SimpleMainTest(
+        tests.emplace_back(new SimpleMainTest(
             testsLength_,
             arrayLength,
             ReverseRangeMaker(),
             sheet,
-            "MainTest; " + PrintTools::to_string_with_precision(arrayLength, 4) + "; rvrs"
+            "MainTest; " + PrintTools::to_string_with_precision(arrayLength, 4) + "; revrs"
         ));
     }
 
-    return ret;
+    return tests;
 }
 
 }  // namespace test

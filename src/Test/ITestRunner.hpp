@@ -6,9 +6,9 @@ namespace test
 class ITestRunner
 {
 public:
-    virtual void run() = 0;
-
     virtual ~ITestRunner() = default;
+
+    virtual void run() = 0;
 };
 
 }  // namespace test

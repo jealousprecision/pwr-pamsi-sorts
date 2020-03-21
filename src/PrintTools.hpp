@@ -151,4 +151,6 @@ std::string to_string_with_precision(T t, size_t precision = 6)
     return sst.str();
 }
 
+extern const char* deleteLine;
+
 }  // namespace PrintTools

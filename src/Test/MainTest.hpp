@@ -5,6 +5,7 @@
 #include <vector>
 #include <functional>
 #include <stdexcept>
+#include <limits>
 #include <Test/ITest.hpp>
 #include <PrintTools.hpp>
 
@@ -52,29 +53,44 @@ struct SortedRangeMaker
         percentage_ = percentage;
     }
 
+    SortedRangeMaker(double percentage, size_t max) :
+        SortedRangeMaker(percentage)
+    {
+        max_ = max;
+    }
+
     template<typename Iter>
     void operator() (Iter iter, Iter end)
     {
-        algo::fill_random(iter, end);
+        algo::fill_random(iter, end, max_);
 
         auto size = std::distance(iter, end);
-        auto middleEnd = std::next(iter, (1 - percentage_) * size);
+        auto middleEnd = std::next(iter, percentage_ * size);
 
         intro_sort(iter, middleEnd);
     }
 
 protected:
     double percentage_;
+    size_t max_ = std::numeric_limits<size_t>::max();
 };
 
 struct ReverseRangeMaker
 {
+    ReverseRangeMaker() = default;
+    ReverseRangeMaker(size_t max) :
+        max_(max)
+    {}
+
     template<typename Iter>
     void operator() (Iter iter, Iter end)
     {
-        algo::fill_random(iter, end);
+        algo::fill_random(iter, end, max_);
         intro_sort(iter, end, std::greater<ValFromIter<Iter>>());
     }
+
+protected:
+    size_t max_ = std::numeric_limits<size_t>::max();
 };
 
 }  // namespace test
