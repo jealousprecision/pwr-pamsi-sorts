@@ -22,18 +22,13 @@ namespace
 class ThreadEnvironment
 {
 public:
-    ThreadEnvironment(ITestFactory::TestContainer tests, SortAbstract::Sorts sort) :
-        tests_(std::move(tests)), sort_(sort)
+    ThreadEnvironment(std::unique_ptr<ITest>&& test, SortAbstract::Sorts sort) :
+        test_(std::move(test)), sort_(sort)
     {}
 
     void operator() ()
     {
-        for (int i = 0, n = tests_.size(); i < n; ++i)
-        {
-            setCurrentName(*tests_[i]);
-            tests_[i]->run(sort_);
-            completion_ = static_cast<double>(i) / n;
-        }
+        test_->run(sort_);
 
         isDone_ = true;
     }
@@ -67,7 +62,7 @@ protected:
         nameMutex_.unlock();
     }
 
-    ITestFactory::TestContainer tests_;
+    std::unique_ptr<ITest> test_;
     SortAbstract::Sorts sort_;
 
     std::atomic<bool> isDone_{false};
@@ -88,19 +83,18 @@ void ThreadedTestRunner::run()
     std::vector<std::thread> threads;
 
     for (auto sort : sorts_)
-        envs.emplace_back(new ThreadEnvironment(factory_.create(), sort));
+        for (auto&& test : factory_.create())
+            envs.emplace_back(new ThreadEnvironment(std::move(test), sort));
 
     for (const auto& env : envs)
         threads.emplace_back(std::reference_wrapper<ThreadEnvironment>(*env));
 
-    while (!std::all_of(envs.begin(), envs.end(), isThreadDone))
+    size_t done;
+    while ((done = std::count_if(envs.begin(), envs.end(), isThreadDone)) != envs.size())
     {
-        for (const auto& env : envs)
-            std::cout << env->getName() <<  ": "
-                << PrintTools::to_string_with_precision(env->getCompletion() * 100, 4) << "\% || ";
-
+        std::cout << "Done: " << done << "/" << envs.size();
         std::cout << std::flush;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         std::cout << deleteLine;
     }
 
