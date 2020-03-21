@@ -35,11 +35,6 @@ public:
         isDone_ = true;
     }
 
-    double getCompletion() const
-    {
-        return completion_;
-    }
-
     bool isDone() const
     {
         return isDone_;
@@ -70,13 +65,10 @@ protected:
     SortAbstract::Sorts sort_;
 
     std::atomic<bool> isDone_{false};
-    std::atomic<double> completion_{0.0};
 
     std::mutex nameMutex_;
     std::string name_;
 };
-
-constexpr size_t maxThreads = 10u;
 
 }  // namespace
 
@@ -93,11 +85,13 @@ void ThreadedTestRunner::run()
             envs.emplace_back(new ThreadEnvironment(std::move(test), sort));
 
     size_t currentEnv = 0;
-    for (; currentEnv < maxThreads && currentEnv < envs.size(); ++currentEnv)
+    for (; currentEnv < threads_ && currentEnv < envs.size(); ++currentEnv)
     {
         threads.emplace_back(std::reference_wrapper<ThreadEnvironment>(*envs[currentEnv]));
         envs[currentEnv]->parent = &threads.back();
     }
+
+    std::cout << "Workers: " << threads.size() << std::endl;
 
     size_t done;
     while ((done = std::count_if(envs.begin(), envs.end(), isThreadDone)) != envs.size())
@@ -106,6 +100,8 @@ void ThreadedTestRunner::run()
         {
             if (isThreadDone(env) && isAttached(env))
             {
+                std::cout << "Job done: " << env->getName() << std::endl;
+
                 // remove joinable threads
                 env->parent->join();
                 threads.remove_if([&](const auto& el) { return &el == env->parent; });
@@ -120,21 +116,6 @@ void ThreadedTestRunner::run()
                 }
             }
         }
-
-        std::cout << "Done: " << std::setw(3) << done << "/" << envs.size() << "\n";
-
-        int i = 1;
-        for (const auto& env : envs)
-        {
-            if (isAttached(env))
-            {
-                std::cout << "Worker no. " << i++ << ": " << env->getName() << '\n';
-            }
-        }
-
-        std::cout << std::flush;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        std::cout << PrintTools::deleteLine;
     }
 
     for (auto& thread : threads)

@@ -15,18 +15,31 @@ const std::vector<double> percentages = {0.0, 0.25, 0.5, 0.75, 0.9, 0.99, 0.997}
 
 const size_t testsLength = 100u;
 
-int main()
+const char* desc = "Usage: ./sorts number_of_threads";
+
+int main(int argc, const char** argv)
 {
+    if (argc != 2)
+    {
+        std::cout << desc << std::endl;
+        return 0;
+    }
+
+    auto threads = std::stoi(argv[1]);
+    if (threads <= 0)
+        throw std::runtime_error("Wrong number of threads");
+
     srand(time(nullptr));
 
     test::MainTestFactory factory(testsLength, arrayLengths, percentages);
-    test::TestRunner testRunner(
+    test::ThreadedTestRunner testRunner(
         factory,
         {
             SortAbstract::Sorts::merge,
             SortAbstract::Sorts::intro,
             SortAbstract::Sorts::quick
-        });
+        },
+        threads);
 
     testRunner.run();
 
