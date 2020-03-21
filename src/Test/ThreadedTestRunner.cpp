@@ -82,6 +82,8 @@ protected:
 void ThreadedTestRunner::run()
 {
     constexpr auto deleteLine = "\033[2K\r";
+    const auto isThreadDone = [](const std::unique_ptr<ThreadEnvironment>& env) { return env->isDone(); };
+
     std::vector<std::unique_ptr<ThreadEnvironment>> envs;
     std::vector<std::thread> threads;
 
@@ -91,9 +93,7 @@ void ThreadedTestRunner::run()
     for (const auto& env : envs)
         threads.emplace_back(std::reference_wrapper<ThreadEnvironment>(*env));
 
-    std::cout << std::setprecision(3);
-    while (!std::all_of(envs.begin(), envs.end(),
-        [](const auto& el)->bool{return el->isDone();}))
+    while (!std::all_of(envs.begin(), envs.end(), isThreadDone))
     {
         for (const auto& env : envs)
             std::cout << env->getName() <<  ": "

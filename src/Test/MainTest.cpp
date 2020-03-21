@@ -19,7 +19,7 @@ void SimpleMainTest::run(SortAbstract::Sorts sort)
     Container container;
     container.resize(arrayLength_);
 
-    for (int i = 0; i < testLength_; ++i)
+    for (size_t i = 0; i < testLength_; ++i)
     {
         rangeMaker_(container.begin(), container.end());
 

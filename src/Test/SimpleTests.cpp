@@ -20,7 +20,7 @@ void SortsCorrectlyTest::run(SortAbstract::Sorts sort)
     std::string testname =
         "SortsCorrectlyTest: [" + SortAbstract::toString(sort) + "]: ";
 
-    for (int i = 0; i < times_; ++i)
+    for (size_t i = 0; i < times_; ++i)
     {
         algo::fill_random(vec.begin(), vec.end());
         SortAbstract::sortRange(sort, vec.begin(), vec.end());
@@ -49,7 +49,7 @@ void WorksWithListsTest::run(SortAbstract::Sorts sort)
     std::string testname =
         "WorksWithListsTest: [" + SortAbstract::toString(sort) + "]: ";
 
-    for (int i = 0; i < times_; ++i)
+    for (size_t i = 0; i < times_; ++i)
     {
         algo::fill_random(list.begin(), list.end());
 

@@ -79,7 +79,7 @@ void generate_n_el(InsertIt It, long count, Gen gen)
 constexpr size_t pow(size_t a, size_t b)
 {
     size_t ret = 1;
-    for (int i = 0; i < b; ++i)
+    for (size_t i = 0; i < b; ++i)
         ret *= a;
     return ret;
 }

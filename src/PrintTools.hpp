@@ -119,9 +119,9 @@ public:
 
         os << std::endl;
 
-        for (int y = 0; y < data_[0].data.size(); ++y)
+        for (size_t y = 0; y < data_[0].data.size(); ++y)
         {
-            for (int x = 0; x < data_.size(); ++x)
+            for (size_t x = 0; x < data_.size(); ++x)
                 if (y < data_[x].data.size())
                     os << data_[x].data[y] << ",";
                 else
