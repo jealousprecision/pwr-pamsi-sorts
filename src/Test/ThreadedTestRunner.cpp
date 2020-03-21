@@ -7,9 +7,11 @@
 #include <iomanip>
 #include <iostream>
 #include <functional>
+#include <list>
 #include <thread>
 #include <vector>
 #include <mutex>
+#include <iterator>
 
 #include <PrintTools.hpp>
 
@@ -28,8 +30,8 @@ public:
 
     void operator() ()
     {
+        setCurrentName(*test_);
         test_->run(sort_);
-
         isDone_ = true;
     }
 
@@ -53,6 +55,8 @@ public:
         return ret;
     }
 
+    std::thread* parent{nullptr};
+
 protected:
     void setCurrentName(const ITest& test)
     {
@@ -72,30 +76,67 @@ protected:
     std::string name_;
 };
 
+constexpr size_t maxThreads = 10u;
+
 }  // namespace
 
 void ThreadedTestRunner::run()
 {
-    constexpr auto deleteLine = "\033[2K\r";
+    constexpr auto deleteLine = "\033[2K";
     const auto isThreadDone = [](const std::unique_ptr<ThreadEnvironment>& env) { return env->isDone(); };
+    const auto isAttached = [](const std::unique_ptr<ThreadEnvironment>& env) { return env->parent != nullptr; };
 
     std::vector<std::unique_ptr<ThreadEnvironment>> envs;
-    std::vector<std::thread> threads;
+    std::list<std::thread> threads;
 
     for (auto sort : sorts_)
         for (auto&& test : factory_.create())
             envs.emplace_back(new ThreadEnvironment(std::move(test), sort));
 
-    for (const auto& env : envs)
-        threads.emplace_back(std::reference_wrapper<ThreadEnvironment>(*env));
+    size_t currentEnv = 0;
+    for (; currentEnv < maxThreads && currentEnv < envs.size(); ++currentEnv)
+    {
+        threads.emplace_back(std::reference_wrapper<ThreadEnvironment>(*envs[currentEnv]));
+        envs[currentEnv]->parent = &threads.back();
+    }
 
     size_t done;
     while ((done = std::count_if(envs.begin(), envs.end(), isThreadDone)) != envs.size())
     {
-        std::cout << "Done: " << done << "/" << envs.size();
-        std::cout << std::flush;
+        for (const auto& env : envs)
+        {
+            if (isThreadDone(env) && isAttached(env))
+            {
+                // remove joinable threads
+                env->parent->join();
+                threads.remove_if([&](const auto& el) { return &el == env->parent; });
+                env->parent = nullptr;
+
+                if (currentEnv < envs.size())
+                {
+                    // envs (jobs) still available
+                    threads.emplace_back(std::reference_wrapper<ThreadEnvironment>(*envs[currentEnv]));
+                    envs[currentEnv]->parent = &threads.back();
+                    currentEnv++;
+                }
+            }
+        }
+
+        std::cout << "Done: " << std::setw(3) << done << "/" << envs.size() << "\n";
+
+        int i = 1;
+        for (const auto& env : envs)
+        {
+            if (isAttached(env))
+            {
+                std::cout << "Worker no. " << i++ << ": " << env->getName() << '\n';
+            }
+        }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::cout << deleteLine;
+        const auto escape = "\033[A";
+        for (int j = 0; j < i; ++j)
+            std::cout << escape << deleteLine;
     }
 
     for (auto& thread : threads)
