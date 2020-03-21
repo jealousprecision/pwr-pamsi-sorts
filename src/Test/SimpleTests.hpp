@@ -14,10 +14,12 @@ public:
     {}
 
     void run(SortAbstract::Sorts) override;
+    const std::string& getName() const override;
 
 protected:
     size_t times_;
     size_t length_;
+    std::string name_ = "SortsCorrectlyTest";
 };
 
 class WorksWithListsTest : public ITest
@@ -28,10 +30,12 @@ public:
     {}
 
     void run(SortAbstract::Sorts) override;
+    const std::string& getName() const override;
 
 protected:
     size_t times_;
     size_t length_;
+    std::string name_ = "WorksWithListsTest";
 };
 
 }  // namespace test

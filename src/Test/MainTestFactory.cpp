@@ -8,10 +8,32 @@ namespace test
 
 ITestFactory::TestContainer MainTestFactory::create() const
 {
-    sheets_.emplace_back(new PrintTools::Sheet<unsigned>());
+    sheets_.emplace_back();
+    auto& sheet = sheets_.back();
     TestContainer ret;
 
-    ret.emplace_back(new MainTest(50, {algo::pow(10, 4), algo::pow(10, 6)}, {0.0, 0.997}, sheets_.back()));
+    for (auto arrayLength : lengths_)
+    {
+        for (auto percentage : percentages_)
+        {
+            ret.emplace_back(new SimpleMainTest(
+                testsLength_,
+                arrayLength,
+                SortedRangeMaker(percentage),
+                sheet,
+                "MainTest; " + PrintTools::to_string_with_precision(arrayLength, 4) + "; "
+                    + PrintTools::to_string_with_precision(percentage * 100, 4)
+            ));
+        }
+
+        ret.emplace_back(new SimpleMainTest(
+            testsLength_,
+            arrayLength,
+            ReverseRangeMaker(),
+            sheet,
+            "MainTest; " + PrintTools::to_string_with_precision(arrayLength, 4) + "; rvrs"
+        ));
+    }
 
     return ret;
 }

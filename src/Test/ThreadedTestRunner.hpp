@@ -11,11 +11,10 @@ public:
     ThreadedTestRunner(
         ITestFactory& factory,
         std::vector<SortAbstract::Sorts> sorts) :
-        NewTestRunner(factory, std::move(sorts))
+            NewTestRunner(factory, std::move(sorts))
     {}
 
     void run() override;
-
 };
 
 }  // namespace test

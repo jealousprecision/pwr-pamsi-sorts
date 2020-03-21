@@ -12,11 +12,6 @@
 namespace test
 {
 
-double ITest::completion() const
-{
-    throw std::runtime_error("ITest::completion(): method not implemented!");
-}
-
 void SortsCorrectlyTest::run(SortAbstract::Sorts sort)
 {
     std::vector<int> vec;
@@ -40,6 +35,11 @@ void SortsCorrectlyTest::run(SortAbstract::Sorts sort)
     std::cout << testname << "passed: " << passed << std::endl;
 }
 
+const std::string& SortsCorrectlyTest::getName() const
+{
+    return name_;
+}
+
 void WorksWithListsTest::run(SortAbstract::Sorts sort)
 {
     std::list<int> list;
@@ -60,6 +60,11 @@ void WorksWithListsTest::run(SortAbstract::Sorts sort)
 
     std::cout << testname << "Average time: "
         << algo::average(durations, durations + times_, 0.0) / 1000 << " ms" << std::endl;
+}
+
+const std::string& WorksWithListsTest::getName() const
+{
+    return name_;
 }
 
 }  // namespace test

@@ -10,8 +10,6 @@ void insert_sort(Iter first, Iter end, Comp comp)
 {
     for (auto it = std::next(first, 1); it != end; ++it)
     {
-        std::vector<ValFromIter<Iter>> vec(first, end);
-
         auto key = *it;
         auto prev = std::next(it, -1);
 

@@ -11,7 +11,7 @@ public:
     virtual ~ITest() = default;
 
     virtual void run(SortAbstract::Sorts) = 0;
-    virtual double completion() const;
+    virtual const std::string& getName() const = 0;
 };
 
 }  // namespace test

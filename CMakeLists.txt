@@ -15,5 +15,7 @@ add_executable(sorts
     ./src/Test/BasicTestFactory.cpp
     ./src/Test/MainTestFactory.cpp)
 
+set(CMAKE_CXX_FLAGS "-Wall")
+
 target_include_directories(sorts PUBLIC src/)
 target_link_libraries(sorts ${CMAKE_THREAD_LIBS_INIT})
