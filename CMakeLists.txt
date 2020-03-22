@@ -11,7 +11,6 @@ add_executable(sorts
     ./src/Test/SimpleTests.cpp
     ./src/Test/MainTest.cpp
     ./src/Test/TestRunner.cpp
-    ./src/Test/ThreadedTestRunner.cpp
     ./src/Test/BasicTestFactory.cpp
     ./src/Test/MainTestFactory.cpp)
 
