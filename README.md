@@ -14,4 +14,4 @@ make sorts
 ```
 
 ## Notes
-If project runs **slow** try replacing `cmake ..` command with `cmake .. -DCMAKE_BUILD_TYPE=Release`.
+If project runs **slow** try replacing `cmake ..` command with `cmake .. -DCMAKE_BUILD_TYPE=Release`
