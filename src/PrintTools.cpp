@@ -9,13 +9,13 @@ const char* deleteLine = "\033[2K\r";
 
 void LoadingBar::start()
 {
-    os_ << text_ << "0\%" << std::flush;
+    os_ << text_ << "0%" << std::flush;
 }
 
 void LoadingBar::markProgress(unsigned u)
 {
     progress_ += u;
-    os_ << deleteLine << text_ << getPercent() << "\%" << std::flush;
+    os_ << deleteLine << text_ << getPercent() << "%" << std::flush;
 }
 
 void LoadingBar::end()

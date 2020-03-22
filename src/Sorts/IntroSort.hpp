@@ -1,8 +1,11 @@
 #pragma once
 
 #include <cmath>
+#include <functional>
 #include <iterator>
+
 #include <Algo.hpp>
+#include <Sorts/HeapSort.hpp>
 
 #include "SortsMacros.hpp"
 

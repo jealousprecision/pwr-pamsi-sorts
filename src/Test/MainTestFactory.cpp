@@ -22,7 +22,7 @@ ITestFactory::TestContainer MainTestFactory::create() const
                 SortedRangeMaker(percentage),
                 sheet,
                 "MainTest; " + std::to_string(arrayLength) + "; "
-                    + PrintTools::to_string_with_precision(percentage * 100, 4) + '\%'
+                    + PrintTools::to_string_with_precision(percentage * 100, 4) + '%'
             ));
         }
 

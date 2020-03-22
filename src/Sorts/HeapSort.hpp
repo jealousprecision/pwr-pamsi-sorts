@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 
 #include "SortsMacros.hpp"
 
@@ -39,7 +40,7 @@ void heap_sort(Iter first, Iter end, Comp comp)
 {
     auto size = std::distance(first, end);
     auto lastParent = std::next(first, size / 2 - 1);
-    for (long i = size / 2 - 1; i >= 0; --i)
+    for (size_t i = size / 2 - 1; i >= 0; --i)
     {
         push_down(lastParent, size, i, comp);
         lastParent--;

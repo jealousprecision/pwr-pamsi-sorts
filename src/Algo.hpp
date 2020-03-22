@@ -1,8 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <functional>
 #include <numeric>
 #include <vector>
+#include <utility>
 #include <Sorts/SortsMacros.hpp>
 
 namespace algo
@@ -70,9 +72,9 @@ void merge(Iter first, Iter halfRangeEnd, Iter end, Comp comp)
 }
 
 template<typename InsertIt, typename Gen>
-void generate_n_el(InsertIt It, long count, Gen gen)
+void generate_n_el(InsertIt It, size_t count, Gen gen)
 {
-    for (long i = 0; i < count; ++i)
+    for (size_t i = 0; i < count; ++i)
         *It++ = gen();
 }
 
@@ -94,14 +96,14 @@ template<typename Iter>
 void fill_random(Iter iter, Iter end)
 {
     for (; iter != end; ++iter)
-        *iter = rand();
+        *iter = std::rand();
 }
 
 template<typename Iter>
 void fill_random(Iter iter, Iter end, size_t max)
 {
-    for(; iter != end; ++iter)
-        *iter = rand() % max;
+    for (; iter != end; ++iter)
+        *iter = std::rand() % max;
 }
 
 }  // namespace algo

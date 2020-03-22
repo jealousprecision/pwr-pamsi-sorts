@@ -3,8 +3,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED 14)
 
 project(pamsi-sorts VERSION 1.0)
 
-find_package(Threads REQUIRED)
-
 add_executable(sorts
     ./src/main.cpp
     ./src/PrintTools.cpp
@@ -17,4 +15,3 @@ add_executable(sorts
 set(CMAKE_CXX_FLAGS "-Wall")
 
 target_include_directories(sorts PUBLIC src/)
-target_link_libraries(sorts ${CMAKE_THREAD_LIBS_INIT})

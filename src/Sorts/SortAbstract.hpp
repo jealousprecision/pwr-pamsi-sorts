@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <string>
 #include <stdexcept>
 #include <Sorts/Sorts.hpp>
@@ -18,7 +19,7 @@ public:
 
     static std::string toString(Sorts sort)
     {
-        switch(sort)
+        switch (sort)
         {
         case Sorts::merge:
             return "MergeSort";
@@ -38,7 +39,7 @@ public:
     template<typename Iter, typename Comp>
     static void sortRange(Sorts sortType, Iter first, Iter end, Comp comp)
     {
-        switch(sortType)
+        switch (sortType)
         {
         case Sorts::merge:
             merge_sort(first, end, comp);

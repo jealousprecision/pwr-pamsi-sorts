@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <Test/ITest.hpp>
 #include <Algo.hpp>
 
@@ -9,7 +11,7 @@ namespace test
 class SortsCorrectlyTest : public ITest
 {
 public:
-    SortsCorrectlyTest(size_t times = 100, size_t length = algo::pow(10, 5)) :
+    SortsCorrectlyTest(size_t times, size_t length) :
         times_(times), length_(length)
     {}
 
@@ -25,7 +27,7 @@ protected:
 class WorksWithListsTest : public ITest
 {
 public:
-    WorksWithListsTest(size_t times = 1, size_t length = algo::pow(10, 5)) :
+    WorksWithListsTest(size_t times, size_t length) :
         times_(times), length_(length)
     {}
 

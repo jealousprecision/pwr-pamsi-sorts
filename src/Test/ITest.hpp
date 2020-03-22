@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <Sorts/SortAbstract.hpp>
 
 namespace test

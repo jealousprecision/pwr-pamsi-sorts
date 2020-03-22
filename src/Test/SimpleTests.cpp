@@ -5,6 +5,7 @@
 #include <iostream>
 #include <list>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 #include <Timer.hpp>
@@ -44,7 +45,9 @@ void WorksWithListsTest::run(SortAbstract::Sorts sort)
 {
     std::list<int> list;
     list.resize(length_);
-    unsigned durations[times_];
+    std::vector<unsigned> durations;
+    durations.resize(times_);
+
     Timer timer;
     std::string testname =
         "WorksWithListsTest: [" + SortAbstract::toString(sort) + "]: ";
@@ -59,7 +62,7 @@ void WorksWithListsTest::run(SortAbstract::Sorts sort)
     };
 
     std::cout << testname << "Average time: "
-        << algo::average(durations, durations + times_, 0.0) / 1000 << " ms" << std::endl;
+        << algo::average(durations.begin(), durations.end(), 0.0) / 1000 << " ms" << std::endl;
 }
 
 const std::string& WorksWithListsTest::getName() const
