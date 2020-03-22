@@ -8,3 +8,4 @@
 
 #include "TestRunner.hpp"
 #include "ThreadedTestRunner.hpp"
+#include "TestRunnerFactory.hpp"
