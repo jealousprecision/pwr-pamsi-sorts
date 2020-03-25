@@ -142,8 +142,6 @@ protected:
     std::vector<InternalRow> data_;
 };
 
-std::shared_ptr<Sheet<unsigned>> getSheetInstance();
-
 template<typename T>
 std::string to_string_with_precision(T t, size_t precision = 6)
 {

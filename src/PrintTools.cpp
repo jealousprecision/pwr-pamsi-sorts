@@ -28,10 +28,4 @@ unsigned LoadingBar::getPercent()
     return static_cast<double>(progress_) / max_ * 100;
 }
 
-std::shared_ptr<Sheet<unsigned>> getSheetInstance()
-{
-    static std::shared_ptr<Sheet<unsigned>> obj(new Sheet<unsigned>());
-    return obj;
-}
-
 }  // namespace PrintTools
